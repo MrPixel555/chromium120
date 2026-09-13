@@ -1,0 +1,348 @@
+name: LGWOS Chromium120 Incremental V4
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-chr120-incremental-v4.yml
+
+permissions:
+  contents: read
+
+env:
+  LGWOS_TARGET_SHA: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+  WEBOS_SDK_URL: https://github.com/openlgtv/buildroot-nc4/releases/download/webos-a38c582/arm-webos-linux-gnueabi_sdk-buildroot-x86_64.tar.gz
+  WEBOS_SDK_SHA256: 04ad3311b48b4557a7002aef56ae2e167478e8e129f37daac04649bddf813616
+  BUILDROOT_REF: a38c582ea397fec612811f8e933ae982d41fc5a3
+  OUT_DIR: out/LGWOS-Probe
+  SYSDEPS_CHECKPOINT_SCHEMA: sysdeps-v2
+  CHROMIUM_CHECKPOINT_SCHEMA: chromium-out-v3
+
+jobs:
+  incremental:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+
+    steps:
+      - name: Runner cleanup
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+          sudo rm -rf /usr/share/swift || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune -af || true
+          sudo apt-get clean || true
+          df -h /
+
+      - name: Checkout exact Chromium 120 source
+        uses: actions/checkout@v4
+        with:
+          ref: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          clean: true
+
+      - name: Install host prerequisites
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bc binutils bzip2 ca-certificates cpio curl file gcc g++ gzip \
+            libglib2.0-dev make ninja-build patch perl pkg-config python3 \
+            python3-six rsync tar unzip wget xz-utils
+
+      - name: Create Debian multiarch pkg-config bridge
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
+          HOST_MULTIARCH="$(gcc -print-multiarch)"
+          HOST_PC_DIR="/usr/lib/$HOST_MULTIARCH/pkgconfig"
+          test -d "$HOST_PC_DIR"
+          sudo mkdir -p /usr/lib/pkgconfig
+          for PC in "$HOST_PC_DIR"/*.pc; do
+            if [ -f "$PC" ]; then
+              sudo ln -sfn "$PC" "/usr/lib/pkgconfig/$(basename "$PC")"
+            fi
+          done
+          {
+            echo "HOST_MULTIARCH=$HOST_MULTIARCH"
+            for P in glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0; do
+              echo "$P=$(/usr/bin/pkg-config --modversion "$P")"
+              readlink -f "/usr/lib/pkgconfig/$P.pc"
+            done
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/host-pkgconfig.log"
+
+      - name: Download and relocate webOS SDK
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SDK_ARCHIVE="$RUNNER_TEMP/webos-sdk.tar.gz"
+          curl -fL --retry 5 --retry-delay 3 --retry-all-errors --connect-timeout 20 \
+            -o "$SDK_ARCHIVE" "$WEBOS_SDK_URL"
+          echo "$WEBOS_SDK_SHA256  $SDK_ARCHIVE" | sha256sum -c -
+          sudo rm -rf /opt/lgwos-sdk
+          sudo mkdir -p /opt/lgwos-sdk
+          sudo tar -xzf "$SDK_ARCHIVE" -C /opt/lgwos-sdk
+          rm -f "$SDK_ARCHIVE"
+          sudo chown -R "$USER:$USER" /opt/lgwos-sdk
+          SDK_ENV="$(find /opt/lgwos-sdk -type f -name environment-setup -print -quit)"
+          test -n "$SDK_ENV"
+          SDK_DIR="$(dirname "$SDK_ENV")"
+          if [ -x "$SDK_DIR/relocate-sdk.sh" ]; then
+            "$SDK_DIR/relocate-sdk.sh"
+          fi
+          echo "SDK_DIR=$SDK_DIR" >> "$GITHUB_ENV"
+          echo "SDK_ENV=$SDK_ENV" >> "$GITHUB_ENV"
+          . "$SDK_ENV"
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          echo "TARGET_SYSROOT=$TARGET_SYSROOT" >> "$GITHUB_ENV"
+          {
+            echo "HEAD=$(git rev-parse HEAD)"
+            echo "TARGET_SYSROOT=$TARGET_SYSROOT"
+            ${CC%% *} --version
+            df -h /
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/bootstrap.log"
+          test "$(git rev-parse HEAD)" = "$LGWOS_TARGET_SHA"
+
+      - name: Restore validated sysdeps v2
+        id: sysdeps_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/buildroot-nss-out
+          key: lgwos-${{ env.SYSDEPS_CHECKPOINT_SCHEMA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ env.BUILDROOT_REF }}
+          fail-on-cache-miss: true
+
+      - name: Revalidate and inject target sysdeps
+        shell: bash
+        run: |
+          set -euxo pipefail
+          . "$SDK_ENV"
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/sysdeps.log"
+          BUILDROOT_OUT="$RUNNER_TEMP/buildroot-nss-out"
+          BUILDROOT_CC="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-gcc"
+          BUILDROOT_READELF="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-readelf"
+          STAGING_DIR="$($BUILDROOT_CC --print-sysroot)"
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          REAL_LIBDRM="$(find "$STAGING_DIR/usr/lib" -maxdepth 1 -type f -name 'libdrm.so.*' -print | sort | head -1)"
+          test -n "$REAL_LIBDRM"
+          if "$BUILDROOT_READELF" -d "$REAL_LIBDRM" | grep -q 'libudev'; then
+            echo 'ERROR: libdrm unexpectedly depends on libudev' | tee "$LOG"
+            exit 31
+          fi
+          MAX_GLIBC="$("$BUILDROOT_READELF" --version-info "$REAL_LIBDRM" 2>/dev/null | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -Vu | tail -1 || true)"
+          {
+            echo "STAGING_DIR=$STAGING_DIR"
+            echo "REAL_LIBDRM=$REAL_LIBDRM"
+            echo "LIBDRM_MAX_GLIBC=$MAX_GLIBC"
+          } | tee "$LOG"
+          if [ -n "$MAX_GLIBC" ]; then
+            HIGHEST="$(printf '%s\n' GLIBC_2.14 "$MAX_GLIBC" | sort -V | tail -1)"
+            test "$HIGHEST" = "GLIBC_2.14"
+          fi
+          install -d \
+            "$TARGET_SYSROOT/usr/include/nspr" \
+            "$TARGET_SYSROOT/usr/include/nss" \
+            "$TARGET_SYSROOT/usr/include/libdrm" \
+            "$TARGET_SYSROOT/usr/lib/pkgconfig"
+          rsync -a "$STAGING_DIR/usr/include/nspr/" "$TARGET_SYSROOT/usr/include/nspr/"
+          rsync -a "$STAGING_DIR/usr/include/nss/" "$TARGET_SYSROOT/usr/include/nss/"
+          rsync -a "$STAGING_DIR/usr/include/libdrm/" "$TARGET_SYSROOT/usr/include/libdrm/"
+          cp -a "$STAGING_DIR/usr/include/xf86drm.h" "$TARGET_SYSROOT/usr/include/"
+          cp -a "$STAGING_DIR/usr/include/xf86drmMode.h" "$TARGET_SYSROOT/usr/include/"
+          for PC in nspr.pc nss.pc libdrm.pc; do
+            cp -a "$STAGING_DIR/usr/lib/pkgconfig/$PC" "$TARGET_SYSROOT/usr/lib/pkgconfig/"
+          done
+          for GLOB in \
+            'libnspr4.so*' 'libplc4.so*' 'libplds4.so*' 'libnss*.so*' \
+            'libsmime3.so*' 'libssl3.so*' 'libsoftokn3.so*' \
+            'libfreebl*.so*' 'libdrm.so*'; do
+            for F in "$STAGING_DIR/usr/lib"/$GLOB; do
+              if [ -e "$F" ]; then cp -a "$F" "$TARGET_SYSROOT/usr/lib/"; fi
+            done
+          done
+          export PKG_CONFIG_SYSROOT_DIR="$TARGET_SYSROOT"
+          export PKG_CONFIG_LIBDIR="$TARGET_SYSROOT/usr/lib/pkgconfig:$TARGET_SYSROOT/usr/share/pkgconfig"
+          test "$(/usr/bin/pkg-config --modversion nss)" = "3.108"
+          test "$(/usr/bin/pkg-config --modversion nspr)" = "4.36.0"
+          test "$(/usr/bin/pkg-config --modversion libdrm)" = "2.4.124"
+          echo 'SYSDEPS_READY=1' | tee -a "$LOG"
+
+      - name: Patch irrelevant Mesa DRI lookup for non-VAAPI build
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE/src"
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('media/gpu/sandbox/BUILD.gn')
+          s = p.read_text()
+          old = '''  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
+              !is_castos) {'''
+          new = '''  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
+              !is_castos && use_vaapi) {'''
+          if old not in s:
+              raise SystemExit('expected DRI condition not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          git diff --check
+          git diff -- media/gpu/sandbox/BUILD.gn | tee "$GITHUB_WORKSPACE/lgwos-logs/dri-gate.patch"
+
+      - name: Audit host and target GLib through Chromium wrapper
+        shell: bash
+        run: |
+          set -euxo pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          {
+            echo '=== HOST GLIB ==='
+            /usr/bin/python3 build/config/linux/pkg-config.py \
+              -s / -a x64 --system_libdir lib -p /usr/bin/pkg-config \
+              glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0
+            echo '=== TARGET GLIB ==='
+            /usr/bin/python3 build/config/linux/pkg-config.py \
+              -s "$TARGET_SYSROOT" -a arm --system_libdir lib -p /usr/bin/pkg-config \
+              glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/glib-audit.log"
+
+      - name: Restore Chromium incremental checkpoint
+        id: chromium_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: src/out/LGWOS-Probe
+          key: lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ github.run_id }}
+          restore-keys: |
+            lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-
+          fail-on-cache-miss: false
+
+      - name: Generate GN graph
+        shell: bash
+        run: |
+          set -euxo pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          TARGET_CC="$(command -v ${CC%% *})"
+          TARGET_CXX="$(command -v ${CXX%% *})"
+          TARGET_AR="$(command -v ${AR%% *})"
+          TARGET_LD="$(command -v ${LD%% *})"
+          TARGET_NM="$(command -v ${NM%% *})"
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          HOST_CC="$(command -v gcc)"
+          HOST_CXX="$(command -v g++)"
+          HOST_AR="$(command -v ar)"
+          HOST_NM="$(command -v nm)"
+          ARGS_FILE="$GITHUB_WORKSPACE/lgwos-logs/args.gn"
+          cat > "$ARGS_FILE" <<EOF
+          is_webos=true
+          is_cross_linux_build=true
+          is_clang=false
+          is_debug=false
+          is_component_build=false
+          target_os="linux"
+          target_cpu="arm"
+          arm_arch="armv7-a"
+          arm_version=7
+          arm_float_abi="softfp"
+          use_sysroot=false
+          target_sysroot="$TARGET_SYSROOT"
+          system_libdir="lib"
+          pkg_config="/usr/bin/pkg-config"
+          use_custom_libcxx=false
+          host_toolchain="//build/toolchain/cros:host"
+          cros_host_ar="$HOST_AR"
+          cros_host_cc="$HOST_CC"
+          cros_host_cxx="$HOST_CXX"
+          cros_host_ld="$HOST_CXX"
+          cros_host_nm="$HOST_NM"
+          cros_host_sysroot="/"
+          cros_target_ar="$TARGET_AR"
+          cros_target_cc="$TARGET_CC"
+          cros_target_cxx="$TARGET_CXX"
+          cros_target_ld="$TARGET_LD"
+          cros_target_nm="$TARGET_NM"
+          webos_toolprefix="arm-webos-linux-gnueabi-"
+          enable_nacl=false
+          enable_print_preview=false
+          enable_remoting=false
+          use_cups=false
+          use_kerberos=false
+          use_gnome_keyring=false
+          use_dbus=false
+          use_pangocairo=false
+          use_vaapi=false
+          use_v4l2_codec=false
+          use_ozone=true
+          ozone_auto_platforms=false
+          fatal_linker_warnings=false
+          use_debug_fission=false
+          proprietary_codecs=true
+          ffmpeg_branding="Chrome"
+          EOF
+          sed -i 's/^          //' "$ARGS_FILE"
+          cat "$ARGS_FILE" | tee "$GITHUB_WORKSPACE/lgwos-logs/args-echo.log"
+          ./buildtools/linux64/gn gen "$OUT_DIR" \
+            --args="$(cat "$ARGS_FILE")" \
+            2>&1 | tee "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
+          echo 'GN_RC=0' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
+
+      - name: Inspect official targets
+        shell: bash
+        run: |
+          set -euxo pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          {
+            echo '=== CHROME ==='
+            ./buildtools/linux64/gn desc "$OUT_DIR" //chrome:chrome
+            echo '=== WEBOS WEBRUNTIME ==='
+            ./buildtools/linux64/gn desc "$OUT_DIR" //webos:weboswebruntime
+          } > "$GITHUB_WORKSPACE/lgwos-logs/gn-targets.log" 2>&1
+
+      - name: Continue base build
+        shell: bash
+        run: |
+          set -o pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          timeout 45m ninja -C "$OUT_DIR" -j2 base \
+            2>&1 | tee "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
+          RC=${PIPESTATUS[0]}
+          echo "BASE_BUILD_RC=$RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
+          exit "$RC"
+
+      - name: Save Chromium incremental checkpoint
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: src/out/LGWOS-Probe
+          key: lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ github.run_id }}
+
+      - name: Final summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "HEAD=$(git rev-parse HEAD 2>/dev/null || true)"
+            echo "SYSDEPS_CACHE_HIT=${{ steps.sysdeps_cache.outputs.cache-hit }}"
+            echo "CHROMIUM_CACHE_HIT=${{ steps.chromium_cache.outputs.cache-hit }}"
+            df -h /
+            find "$GITHUB_WORKSPACE/lgwos-logs" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort || true
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/final-summary.log"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lgwos-chr120-incremental-v4-logs
+          path: lgwos-logs/
+          if-no-files-found: warn
+          retention-days: 14
