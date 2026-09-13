@@ -185,13 +185,12 @@ jobs:
           from pathlib import Path
           p = Path('media/gpu/sandbox/BUILD.gn')
           s = p.read_text()
-          old = '''  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
-              !is_castos) {'''
-          new = '''  if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
-              !is_castos && use_vaapi) {'''
-          if old not in s:
-              raise SystemExit('expected DRI condition not found')
-          p.write_text(s.replace(old, new, 1))
+          needle = '!is_castos) {'
+          replacement = '!is_castos && use_vaapi) {'
+          count = s.count(needle)
+          if count != 1:
+              raise SystemExit(f'unexpected !is_castos condition count: {count}')
+          p.write_text(s.replace(needle, replacement, 1))
           PY
           git diff --check
           git diff -- media/gpu/sandbox/BUILD.gn | tee "$GITHUB_WORKSPACE/lgwos-logs/dri-gate.patch"
