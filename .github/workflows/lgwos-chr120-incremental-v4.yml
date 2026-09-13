@@ -56,8 +56,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             bc binutils bzip2 ca-certificates cpio curl file gcc g++ gzip \
-            libglib2.0-dev make ninja-build patch perl pkg-config python3 \
-            python3-six rsync tar unzip wget xz-utils
+            libglib2.0-dev libnspr4-dev libnss3-dev make ninja-build patch perl \
+            pkg-config python3 python3-six rsync tar unzip wget xz-utils
 
       - name: Create Debian multiarch pkg-config bridge
         shell: bash
@@ -75,7 +75,7 @@ jobs:
           done
           {
             echo "HOST_MULTIARCH=$HOST_MULTIARCH"
-            for P in glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0; do
+            for P in glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0 nspr nss; do
               echo "$P=$(/usr/bin/pkg-config --modversion "$P")"
               readlink -f "/usr/lib/pkgconfig/$P.pc"
             done
@@ -195,7 +195,7 @@ jobs:
           git diff --check
           git diff -- media/gpu/sandbox/BUILD.gn | tee "$GITHUB_WORKSPACE/lgwos-logs/dri-gate.patch"
 
-      - name: Audit host and target GLib through Chromium wrapper
+      - name: Audit host NSS and host/target GLib through Chromium wrapper
         shell: bash
         run: |
           set -euxo pipefail
@@ -203,6 +203,10 @@ jobs:
           cd "$GITHUB_WORKSPACE/src"
           TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
           {
+            echo '=== HOST NSS EXACT GN PATH ==='
+            /usr/bin/python3 build/config/linux/pkg-config.py \
+              -s / -a x64 -p /usr/bin/pkg-config \
+              nss -v -lssl3
             echo '=== HOST GLIB ==='
             /usr/bin/python3 build/config/linux/pkg-config.py \
               -s / -a x64 --system_libdir lib -p /usr/bin/pkg-config \
@@ -211,7 +215,7 @@ jobs:
             /usr/bin/python3 build/config/linux/pkg-config.py \
               -s "$TARGET_SYSROOT" -a arm --system_libdir lib -p /usr/bin/pkg-config \
               glib-2.0 gmodule-2.0 gobject-2.0 gthread-2.0
-          } | tee "$GITHUB_WORKSPACE/lgwos-logs/glib-audit.log"
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/pkgconfig-audit.log"
 
       - name: Restore Chromium incremental checkpoint
         id: chromium_cache
