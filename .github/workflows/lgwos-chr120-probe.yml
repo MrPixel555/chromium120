@@ -179,6 +179,81 @@ jobs:
             df -h /
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/sdk-abi.log"
 
+      - name: Audit SDK secure getenv ABI
+        id: secure_env_abi
+        shell: bash
+        run: |
+          set -uo pipefail
+          . "$SDK_ENV"
+
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          LIBC_SO="$(${CC%% *} -print-file-name=libc.so.6)"
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/sdk-secure-getenv-abi.log"
+
+          {
+            echo "TARGET_SYSROOT=$TARGET_SYSROOT"
+            echo "LIBC_SO=$LIBC_SO"
+            file "$LIBC_SO" || true
+            echo '--- libc secure getenv dynamic symbols ---'
+            ${READELF%% *} -Ws "$LIBC_SO" 2>/dev/null | grep -E '(__)?secure_getenv' || true
+            echo '--- libc GLIBC symbol versions ---'
+            ${READELF%% *} --version-info "$LIBC_SO" 2>/dev/null | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -Vu | tail -40 || true
+          } | tee "$LOG"
+
+          cat > "$RUNNER_TEMP/lgwos-secure-getenv-public.c" <<'EOF'
+          #define _GNU_SOURCE 1
+          #include <stdlib.h>
+          int main(void) {
+            return secure_getenv("LGWOS") ? 0 : 0;
+          }
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/lgwos-secure-getenv-public.c"
+
+          set +e
+          ${CC%% *} \
+            -std=c99 \
+            -Werror=implicit-function-declaration \
+            "$RUNNER_TEMP/lgwos-secure-getenv-public.c" \
+            -o "$RUNNER_TEMP/lgwos-secure-getenv-public" \
+            >> "$LOG" 2>&1
+          PUBLIC_RC=$?
+          set -e
+
+          cat > "$RUNNER_TEMP/lgwos-secure-getenv-legacy.c" <<'EOF'
+          extern char *__secure_getenv(const char *);
+          int main(void) {
+            return __secure_getenv("LGWOS") ? 0 : 0;
+          }
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/lgwos-secure-getenv-legacy.c"
+
+          set +e
+          ${CC%% *} \
+            -std=c99 \
+            -Werror=implicit-function-declaration \
+            "$RUNNER_TEMP/lgwos-secure-getenv-legacy.c" \
+            -o "$RUNNER_TEMP/lgwos-secure-getenv-legacy" \
+            >> "$LOG" 2>&1
+          LEGACY_RC=$?
+          set -e
+
+          {
+            echo "SECURE_GETENV_PUBLIC_RC=$PUBLIC_RC"
+            echo "SECURE_GETENV_LEGACY_RC=$LEGACY_RC"
+          } | tee -a "$LOG"
+
+          if [ "$PUBLIC_RC" -eq 0 ]; then
+            MODE="secure_getenv"
+          elif [ "$LEGACY_RC" -eq 0 ]; then
+            MODE="__secure_getenv"
+          else
+            MODE="unavailable"
+          fi
+
+          echo "LGWOS_SECURE_GETENV_MODE=$MODE" | tee -a "$LOG"
+          echo "LGWOS_SECURE_GETENV_MODE=$MODE" >> "$GITHUB_ENV"
+          echo "secure_getenv_mode=$MODE" >> "$GITHUB_OUTPUT"
+
       - name: Audit target pkg-config metadata before augmentation
         shell: bash
         run: |
@@ -225,12 +300,21 @@ jobs:
           BUILDROOT_OUT="$RUNNER_TEMP/buildroot-nss-out"
           BUILDROOT_TARBALL="$RUNNER_TEMP/buildroot-nc4.tar.gz"
           TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
 
           rm -rf "$BUILDROOT_SRC" "$BUILDROOT_OUT" "$BUILDROOT_TARBALL"
           mkdir -p "$BUILDROOT_SRC" "$BUILDROOT_OUT"
 
-          echo '=== FETCH EXACT BUILDROOT SOURCE ===' | tee "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
-          echo "BUILDROOT_REF=$BUILDROOT_REF" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== FETCH EXACT BUILDROOT SOURCE ===' | tee "$LOG"
+          echo "BUILDROOT_REF=$BUILDROOT_REF" | tee -a "$LOG"
+          echo "LGWOS_SECURE_GETENV_MODE=${LGWOS_SECURE_GETENV_MODE:-UNSET}" | tee -a "$LOG"
+
+          if [ "${LGWOS_SECURE_GETENV_MODE:-unavailable}" = "unavailable" ]; then
+            echo 'NSS_COMPAT_ERROR=no secure getenv ABI available' | tee -a "$LOG"
+            echo 'NSS_AUGMENT_RC=90' >> "$GITHUB_ENV"
+            echo 'nss_augment_rc=90' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           set +e
           curl -fL \
@@ -240,12 +324,12 @@ jobs:
             --connect-timeout 20 \
             -o "$BUILDROOT_TARBALL" \
             "https://codeload.github.com/openlgtv/buildroot-nc4/tar.gz/$BUILDROOT_REF" \
-            2>&1 | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            2>&1 | tee -a "$LOG"
           FETCH_RC=${PIPESTATUS[0]}
           set -e
 
           if [ "$FETCH_RC" -ne 0 ]; then
-            echo "BUILDROOT_FETCH_RC=$FETCH_RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            echo "BUILDROOT_FETCH_RC=$FETCH_RC" | tee -a "$LOG"
             echo "NSS_AUGMENT_RC=$FETCH_RC" >> "$GITHUB_ENV"
             echo "nss_augment_rc=$FETCH_RC" >> "$GITHUB_OUTPUT"
             exit 0
@@ -254,7 +338,7 @@ jobs:
           tar -xzf "$BUILDROOT_TARBALL" --strip-components=1 -C "$BUILDROOT_SRC"
           rm -f "$BUILDROOT_TARBALL"
 
-          echo '=== RESTORE UPSTREAM BUILDROOT KERNEL-HEADER VALIDATION ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== RESTORE UPSTREAM BUILDROOT KERNEL-HEADER VALIDATION ===' | tee -a "$LOG"
           python3 - "$BUILDROOT_SRC/toolchain/helpers.mk" <<'PY'
           from pathlib import Path
           import sys
@@ -281,6 +365,22 @@ jobs:
           path.write_text("".join(out))
           PY
 
+          if [ "$LGWOS_SECURE_GETENV_MODE" = "__secure_getenv" ]; then
+            echo '=== INSTALL LGWOS LEGACY-GLIBC NSS COMPAT HOOK ===' | tee -a "$LOG"
+            cat >> "$BUILDROOT_SRC/package/libnss/libnss.mk" <<'EOF'
+
+          # LGWOS compatibility: this SDK targets a pre-glibc-2.17 userspace.
+          # NSS 3.108 uses public secure_getenv(), while NSPR detects and uses
+          # the ABI-compatible legacy __secure_getenv() symbol on this target.
+          define LIBNSS_LGWOS_LEGACY_SECURE_GETENV
+          	$(SED) '/#include <stdlib.h>/a extern char *__secure_getenv(const char *);' $(@D)/nss/lib/freebl/stubs.c
+          	$(SED) 's/return secure_getenv(var);/return __secure_getenv(var);/' $(@D)/nss/lib/freebl/stubs.c
+          endef
+          LIBNSS_PRE_CONFIGURE_HOOKS += LIBNSS_LGWOS_LEGACY_SECURE_GETENV
+          EOF
+            sed -i 's/^          //' "$BUILDROOT_SRC/package/libnss/libnss.mk"
+          fi
+
           {
             echo '--- restored helper ---'
             grep -A6 '^check_kernel_headers_version = ' "$BUILDROOT_SRC/toolchain/helpers.mk"
@@ -291,7 +391,10 @@ jobs:
             grep -E '^LIBNSPR_VERSION|^LIBNSS_VERSION' \
               "$BUILDROOT_SRC/package/libnspr/libnspr.mk" \
               "$BUILDROOT_SRC/package/libnss/libnss.mk"
-          } | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            echo '--- LGWOS NSS compatibility hook ---'
+            grep -A8 '^define LIBNSS_LGWOS_LEGACY_SECURE_GETENV' \
+              "$BUILDROOT_SRC/package/libnss/libnss.mk" || true
+          } | tee -a "$LOG"
 
           cat > "$BUILDROOT_SRC/configs/lgwos_nss_defconfig" <<EOF
           BR2_arm=y
@@ -323,14 +426,14 @@ jobs:
           EOF
           sed -i 's/^          //' "$BUILDROOT_SRC/configs/lgwos_nss_defconfig"
 
-          echo '=== CONFIGURE BUILDROOT WITH EXISTING WEBOS SDK AS EXTERNAL TOOLCHAIN ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== CONFIGURE BUILDROOT WITH EXISTING WEBOS SDK AS EXTERNAL TOOLCHAIN ===' | tee -a "$LOG"
           set +e
           make -C "$BUILDROOT_SRC" O="$BUILDROOT_OUT" lgwos_nss_defconfig \
-            2>&1 | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            2>&1 | tee -a "$LOG"
           CONFIG_RC=${PIPESTATUS[0]}
           set -e
 
-          echo "BUILDROOT_CONFIG_RC=$CONFIG_RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "BUILDROOT_CONFIG_RC=$CONFIG_RC" | tee -a "$LOG"
           if [ "$CONFIG_RC" -ne 0 ]; then
             echo "NSS_AUGMENT_RC=$CONFIG_RC" >> "$GITHUB_ENV"
             echo "nss_augment_rc=$CONFIG_RC" >> "$GITHUB_OUTPUT"
@@ -343,23 +446,23 @@ jobs:
               "$BUILDROOT_OUT/.config" | sort || true
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/nss-build-config.log"
 
-          echo '=== BUILD LIBNSS TARGET AND DEPENDENCIES ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== BUILD LIBNSS TARGET AND DEPENDENCIES ===' | tee -a "$LOG"
           set +e
           make -C "$BUILDROOT_SRC" O="$BUILDROOT_OUT" -j4 libnss \
-            2>&1 | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            2>&1 | tee -a "$LOG"
           BUILD_RC=${PIPESTATUS[0]}
           set -e
 
-          echo "BUILDROOT_LIBNSS_RC=$BUILD_RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "BUILDROOT_LIBNSS_RC=$BUILD_RC" | tee -a "$LOG"
           if [ "$BUILD_RC" -ne 0 ]; then
             echo "NSS_AUGMENT_RC=$BUILD_RC" >> "$GITHUB_ENV"
             echo "nss_augment_rc=$BUILD_RC" >> "$GITHUB_OUTPUT"
-            df -h / | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            df -h / | tee -a "$LOG"
             exit 0
           fi
 
           STAGING_DIR="$(readlink -f "$BUILDROOT_OUT/staging")"
-          echo "NSS_BUILD_STAGING=$STAGING_DIR" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "NSS_BUILD_STAGING=$STAGING_DIR" | tee -a "$LOG"
 
           VERIFY_RC=0
           for F in \
@@ -370,10 +473,23 @@ jobs:
             "$STAGING_DIR/usr/lib/libssl3.so"
           do
             if [ -e "$F" ]; then
-              echo "BUILT_OK=$F" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+              echo "BUILT_OK=$F" | tee -a "$LOG"
             else
-              echo "BUILT_MISSING=$F" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+              echo "BUILT_MISSING=$F" | tee -a "$LOG"
               VERIFY_RC=1
+            fi
+          done
+
+          echo '=== NSS/NSPR GLIBC VERSION AUDIT ===' | tee -a "$LOG"
+          for F in "$STAGING_DIR/usr/lib"/libnspr4.so "$STAGING_DIR/usr/lib"/libnss*.so "$STAGING_DIR/usr/lib"/libssl3.so "$STAGING_DIR/usr/lib"/libsmime3.so "$STAGING_DIR/usr/lib"/libfreebl*.so; do
+            if [ -e "$F" ]; then
+              echo "--- $(basename "$F") ---" | tee -a "$LOG"
+              ${READELF%% *} -Ws "$F" 2>/dev/null | grep -E '(__)?secure_getenv' | tee -a "$LOG" || true
+              ${READELF%% *} --version-info "$F" 2>/dev/null | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -Vu | tee -a "$LOG" || true
+              if ${READELF%% *} --version-info "$F" 2>/dev/null | grep -q 'GLIBC_2\.17'; then
+                echo "FORBIDDEN_GLIBC_2_17=$(basename "$F")" | tee -a "$LOG"
+                VERIFY_RC=1
+              fi
             fi
           done
 
@@ -383,7 +499,7 @@ jobs:
             exit 0
           fi
 
-          echo '=== INJECT ONLY NSPR/NSS ARTIFACTS INTO CHROMIUM SDK SYSROOT ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== INJECT ONLY NSPR/NSS ARTIFACTS INTO CHROMIUM SDK SYSROOT ===' | tee -a "$LOG"
           install -d \
             "$TARGET_SYSROOT/usr/include/nspr" \
             "$TARGET_SYSROOT/usr/include/nss" \
@@ -407,19 +523,19 @@ jobs:
             for F in "$STAGING_DIR/usr/lib"/$GLOB; do
               if [ -e "$F" ]; then
                 cp -a "$F" "$TARGET_SYSROOT/usr/lib/"
-                echo "INJECTED=$(basename "$F")" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+                echo "INJECTED=$(basename "$F")" | tee -a "$LOG"
               fi
             done
           done
 
-          echo '=== POST-INJECTION PKG-CONFIG AND LINK PROBE ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo '=== POST-INJECTION PKG-CONFIG AND LINK PROBE ===' | tee -a "$LOG"
           export PKG_CONFIG_SYSROOT_DIR="$TARGET_SYSROOT"
           export PKG_CONFIG_LIBDIR="$TARGET_SYSROOT/usr/lib/pkgconfig:$TARGET_SYSROOT/usr/share/pkgconfig"
 
           NSS_VERSION="$(/usr/bin/pkg-config --modversion nss 2>/dev/null || true)"
           NSPR_VERSION="$(/usr/bin/pkg-config --modversion nspr 2>/dev/null || true)"
-          echo "NSS_VERSION=$NSS_VERSION" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
-          echo "NSPR_VERSION=$NSPR_VERSION" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "NSS_VERSION=$NSS_VERSION" | tee -a "$LOG"
+          echo "NSPR_VERSION=$NSPR_VERSION" | tee -a "$LOG"
 
           if [ -z "$NSS_VERSION" ] || [ -z "$NSPR_VERSION" ]; then
             VERIFY_RC=1
@@ -435,34 +551,34 @@ jobs:
 
           NSS_CFLAGS="$(/usr/bin/pkg-config --cflags nss 2>/dev/null || true)"
           NSS_LIBS="$(/usr/bin/pkg-config --libs nss 2>/dev/null || true)"
-          echo "NSS_CFLAGS=$NSS_CFLAGS" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
-          echo "NSS_LIBS=$NSS_LIBS" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "NSS_CFLAGS=$NSS_CFLAGS" | tee -a "$LOG"
+          echo "NSS_LIBS=$NSS_LIBS" | tee -a "$LOG"
 
           set +e
           ${CC%% *} $NSS_CFLAGS "$RUNNER_TEMP/lgwos-nss-probe.c" $NSS_LIBS \
             -o "$RUNNER_TEMP/lgwos-nss-probe" \
-            2>&1 | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+            2>&1 | tee -a "$LOG"
           LINK_RC=${PIPESTATUS[0]}
           set -e
 
-          echo "NSS_LINK_PROBE_RC=$LINK_RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "NSS_LINK_PROBE_RC=$LINK_RC" | tee -a "$LOG"
           if [ "$LINK_RC" -ne 0 ]; then
             VERIFY_RC=1
           else
-            file "$RUNNER_TEMP/lgwos-nss-probe" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
-            ${READELF%% *} -h "$RUNNER_TEMP/lgwos-nss-probe" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
-            ${READELF%% *} -d "$RUNNER_TEMP/lgwos-nss-probe" | grep NEEDED | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log" || true
+            file "$RUNNER_TEMP/lgwos-nss-probe" | tee -a "$LOG"
+            ${READELF%% *} -h "$RUNNER_TEMP/lgwos-nss-probe" | tee -a "$LOG"
+            ${READELF%% *} -d "$RUNNER_TEMP/lgwos-nss-probe" | grep NEEDED | tee -a "$LOG" || true
             ${READELF%% *} -A "$TARGET_SYSROOT/usr/lib/libnss3.so" | tee "$GITHUB_WORKSPACE/lgwos-logs/nss-arm-attributes.log"
           fi
 
-          echo "NSS_AUGMENT_RC=$VERIFY_RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          echo "NSS_AUGMENT_RC=$VERIFY_RC" | tee -a "$LOG"
           echo "NSS_AUGMENT_RC=$VERIFY_RC" >> "$GITHUB_ENV"
           echo "nss_augment_rc=$VERIFY_RC" >> "$GITHUB_OUTPUT"
-          df -h / | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          df -h / | tee -a "$LOG"
           exit 0
 
       - name: Audit target pkg-config metadata after augmentation
-        if: ${{ steps.nss_augment.outputs.nss_augment_rc == '0' }}
+        if: ${{ steps.nss_augment.conclusion == 'success' && steps.nss_augment.outputs.nss_augment_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -513,7 +629,7 @@ jobs:
 
       - name: Generate LGWOS GN build graph
         id: gn_gen
-        if: ${{ steps.nss_augment.outputs.nss_augment_rc == '0' }}
+        if: ${{ steps.nss_augment.conclusion == 'success' && steps.nss_augment.outputs.nss_augment_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -600,7 +716,7 @@ jobs:
           exit 0
 
       - name: Inspect generated target graph
-        if: ${{ steps.gn_gen.outputs.gn_rc == '0' }}
+        if: ${{ steps.gn_gen.conclusion == 'success' && steps.gn_gen.outputs.gn_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -614,7 +730,7 @@ jobs:
           tail -200 "$GITHUB_WORKSPACE/lgwos-logs/gn-targets.log"
 
       - name: Compile base smoke target
-        if: ${{ steps.gn_gen.outputs.gn_rc == '0' }}
+        if: ${{ steps.gn_gen.conclusion == 'success' && steps.gn_gen.outputs.gn_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -638,6 +754,7 @@ jobs:
         run: |
           {
             echo "HEAD=$(git rev-parse HEAD 2>/dev/null || true)"
+            echo "LGWOS_SECURE_GETENV_MODE=${LGWOS_SECURE_GETENV_MODE:-NOT_RUN}"
             echo "NSS_AUGMENT_RC=${NSS_AUGMENT_RC:-NOT_RUN}"
             echo "GN_RC=${GN_RC:-NOT_RUN}"
             echo "BASE_BUILD_RC=${BASE_BUILD_RC:-NOT_RUN}"
