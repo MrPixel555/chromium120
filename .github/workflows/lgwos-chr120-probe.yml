@@ -254,7 +254,37 @@ jobs:
           tar -xzf "$BUILDROOT_TARBALL" --strip-components=1 -C "$BUILDROOT_SRC"
           rm -f "$BUILDROOT_TARBALL"
 
+          echo '=== RESTORE UPSTREAM BUILDROOT KERNEL-HEADER VALIDATION ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
+          python3 - "$BUILDROOT_SRC/toolchain/helpers.mk" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          lines = path.read_text().splitlines(True)
+          out = []
+          restoring = False
+          restored = False
+
+          for line in lines:
+              if line.startswith("#check_kernel_headers_version ="):
+                  restoring = True
+                  restored = True
+              if restoring and line.startswith("#"):
+                  line = line[1:]
+              out.append(line)
+              if restoring and line.lstrip().startswith("fi"):
+                  restoring = False
+
+          if not restored:
+              raise SystemExit("expected commented check_kernel_headers_version block not found")
+
+          path.write_text("".join(out))
+          PY
+
           {
+            echo '--- restored helper ---'
+            grep -A6 '^check_kernel_headers_version = ' "$BUILDROOT_SRC/toolchain/helpers.mk"
+            echo '--- versions ---'
             echo "BUILDROOT_SOURCE_REF=$BUILDROOT_REF"
             echo "SDK_DIR=$SDK_DIR"
             echo "TARGET_SYSROOT=$TARGET_SYSROOT"
@@ -432,7 +462,7 @@ jobs:
           exit 0
 
       - name: Audit target pkg-config metadata after augmentation
-        if: env.NSS_AUGMENT_RC == '0'
+        if: ${{ steps.nss_augment.outputs.nss_augment_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -483,7 +513,7 @@ jobs:
 
       - name: Generate LGWOS GN build graph
         id: gn_gen
-        if: env.NSS_AUGMENT_RC == '0'
+        if: ${{ steps.nss_augment.outputs.nss_augment_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -570,7 +600,7 @@ jobs:
           exit 0
 
       - name: Inspect generated target graph
-        if: env.GN_RC == '0'
+        if: ${{ steps.gn_gen.outputs.gn_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
@@ -584,7 +614,7 @@ jobs:
           tail -200 "$GITHUB_WORKSPACE/lgwos-logs/gn-targets.log"
 
       - name: Compile base smoke target
-        if: env.GN_RC == '0'
+        if: ${{ steps.gn_gen.outputs.gn_rc == '0' }}
         shell: bash
         run: |
           set -uo pipefail
