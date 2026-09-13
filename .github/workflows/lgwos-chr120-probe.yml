@@ -706,6 +706,7 @@ jobs:
           use_cups=false
           use_kerberos=false
           use_gnome_keyring=false
+          use_dbus=false
           use_ozone=true
           ozone_auto_platforms=false
           fatal_linker_warnings=false
