@@ -1,0 +1,369 @@
+name: LGWOS libdrm Checkpoint Fix V3
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-libdrm-checkpoint-fix-v3.yml
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: lgwos-libdrm-checkpoint-fix-v2
+  cancel-in-progress: true
+
+env:
+  WEBOS_SDK_SHA256: 04ad3311b48b4557a7002aef56ae2e167478e8e129f37daac04649bddf813616
+  BUILDROOT_REF: a38c582ea397fec612811f8e933ae982d41fc5a3
+  NSS_CHECKPOINT_SCHEMA: nss-v1
+  SYSDEPS_CHECKPOINT_SCHEMA: sysdeps-v1
+
+jobs:
+  repair:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Runner cleanup
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo rm -rf /usr/local/lib/android || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/.ghcup || true
+          sudo rm -rf /usr/share/swift || true
+          sudo rm -rf /opt/hostedtoolcache/CodeQL || true
+          sudo docker system prune -af || true
+          sudo apt-get clean || true
+          df -h /
+
+      - name: Install host prerequisites
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bc \
+            binutils \
+            bzip2 \
+            ca-certificates \
+            cpio \
+            curl \
+            file \
+            gcc \
+            g++ \
+            gzip \
+            make \
+            ninja-build \
+            patch \
+            perl \
+            pkg-config \
+            python3 \
+            python3-six \
+            rsync \
+            tar \
+            unzip \
+            wget \
+            xz-utils
+
+      - name: Restore validated NSS checkpoint
+        id: nss_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/buildroot-nss-out
+          key: lgwos-${{ env.NSS_CHECKPOINT_SCHEMA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ env.BUILDROOT_REF }}
+          fail-on-cache-miss: true
+
+      - name: Validate inherited NSS checkpoint
+        id: nss_validate
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/nss-validation.log"
+          BUILDROOT_OUT="$RUNNER_TEMP/buildroot-nss-out"
+          TARGET_CC="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-gcc"
+
+          RC=0
+          if [ ! -x "$TARGET_CC" ]; then
+            echo "TARGET_CC_MISSING=$TARGET_CC" | tee "$LOG"
+            RC=1
+            STAGING_DIR=
+          else
+            STAGING_DIR="$($TARGET_CC --print-sysroot 2>/dev/null || true)"
+            echo "TARGET_CC=$TARGET_CC" | tee "$LOG"
+            echo "STAGING_DIR=$STAGING_DIR" | tee -a "$LOG"
+            "$TARGET_CC" --version | tee -a "$LOG"
+          fi
+
+          for F in \
+            "$STAGING_DIR/usr/lib/pkgconfig/nspr.pc" \
+            "$STAGING_DIR/usr/lib/pkgconfig/nss.pc" \
+            "$STAGING_DIR/usr/lib/libnspr4.so" \
+            "$STAGING_DIR/usr/lib/libnss3.so" \
+            "$STAGING_DIR/usr/lib/libssl3.so"
+          do
+            if [ -e "$F" ]; then
+              echo "NSS_CHECKPOINT_OK=$F" | tee -a "$LOG"
+            else
+              echo "NSS_CHECKPOINT_MISSING=$F" | tee -a "$LOG"
+              RC=1
+            fi
+          done
+
+          echo "NSS_VALIDATE_RC=$RC" | tee -a "$LOG"
+          echo "NSS_VALIDATE_RC=$RC" >> "$GITHUB_ENV"
+          echo "nss_validate_rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Fetch and prepare exact Buildroot source
+        if: ${{ steps.nss_validate.conclusion == 'success' && steps.nss_validate.outputs.nss_validate_rc == '0' }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          BUILDROOT_SRC="$RUNNER_TEMP/buildroot-nc4"
+          BUILDROOT_TARBALL="$RUNNER_TEMP/buildroot-nc4.tar.gz"
+
+          rm -rf "$BUILDROOT_SRC" "$BUILDROOT_TARBALL"
+          mkdir -p "$BUILDROOT_SRC"
+
+          curl -fL \
+            --retry 5 \
+            --retry-delay 3 \
+            --retry-all-errors \
+            --connect-timeout 20 \
+            -o "$BUILDROOT_TARBALL" \
+            "https://codeload.github.com/openlgtv/buildroot-nc4/tar.gz/$BUILDROOT_REF"
+
+          tar -xzf "$BUILDROOT_TARBALL" --strip-components=1 -C "$BUILDROOT_SRC"
+          rm -f "$BUILDROOT_TARBALL"
+
+          python3 - "$BUILDROOT_SRC/toolchain/helpers.mk" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          lines = path.read_text().splitlines(True)
+          out = []
+          restoring = False
+          restored = False
+          for line in lines:
+              if line.startswith("#check_kernel_headers_version ="):
+                  restoring = True
+                  restored = True
+              if restoring and line.startswith("#"):
+                  line = line[1:]
+              out.append(line)
+              if restoring and line.lstrip().startswith("fi"):
+                  restoring = False
+          if not restored:
+              raise SystemExit("expected commented check_kernel_headers_version block not found")
+          path.write_text("".join(out))
+          PY
+
+          python3 - "$BUILDROOT_SRC/package/libdrm/libdrm.mk" <<'PY'
+          from pathlib import Path
+          import sys
+
+          path = Path(sys.argv[1])
+          text = path.read_text()
+          old = '''ifeq ($(BR2_PACKAGE_HAS_UDEV),y)
+          LIBDRM_CONF_OPTS += -Dudev=true
+          LIBDRM_DEPENDENCIES += udev
+          else
+          LIBDRM_CONF_OPTS += -Dudev=false
+          endif
+          '''
+          old = old.replace('          ', '')
+          new = '''# LGWOS legacy-TV ABI: avoid modern libudev.so.1 dependency.
+          LIBDRM_CONF_OPTS += -Dudev=false
+          '''.replace('          ', '')
+          if old not in text:
+              raise SystemExit("expected libdrm udev block not found")
+          path.write_text(text.replace(old, new, 1))
+          PY
+
+          grep -n -A4 -B4 'LGWOS legacy-TV ABI' "$BUILDROOT_SRC/package/libdrm/libdrm.mk"
+
+      - name: Build legacy-safe libdrm 2.4.124
+        id: libdrm
+        if: ${{ steps.nss_validate.conclusion == 'success' && steps.nss_validate.outputs.nss_validate_rc == '0' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/libdrm-build.log"
+          BUILDROOT_SRC="$RUNNER_TEMP/buildroot-nc4"
+          BUILDROOT_OUT="$RUNNER_TEMP/buildroot-nss-out"
+          TARGET_CC="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-gcc"
+          TARGET_READELF="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-readelf"
+          STAGING_DIR="$($TARGET_CC --print-sysroot 2>/dev/null || true)"
+
+          {
+            echo "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE:-UNSET}"
+            echo "STAGING_DIR=$STAGING_DIR"
+            echo "BUILDROOT_REF=$BUILDROOT_REF"
+          } | tee "$LOG"
+
+          unset CMAKE_TOOLCHAIN_FILE
+
+          set +e
+          make -C "$BUILDROOT_SRC" O="$BUILDROOT_OUT" -j4 libdrm \
+            2>&1 | tee -a "$LOG"
+          BUILD_RC=${PIPESTATUS[0]}
+          set -e
+
+          echo "BUILDROOT_LIBDRM_RC=$BUILD_RC" | tee -a "$LOG"
+          if [ "$BUILD_RC" -ne 0 ]; then
+            echo "LIBDRM_BUILD_RC=$BUILD_RC" >> "$GITHUB_ENV"
+            echo "libdrm_rc=$BUILD_RC" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          VERIFY_RC=0
+          for F in \
+            "$STAGING_DIR/usr/lib/pkgconfig/libdrm.pc" \
+            "$STAGING_DIR/usr/include/xf86drm.h" \
+            "$STAGING_DIR/usr/include/xf86drmMode.h" \
+            "$STAGING_DIR/usr/include/libdrm/drm.h"
+          do
+            if [ -e "$F" ]; then
+              echo "LIBDRM_OK=$F" | tee -a "$LOG"
+            else
+              echo "LIBDRM_MISSING=$F" | tee -a "$LOG"
+              VERIFY_RC=1
+            fi
+          done
+
+          REAL_LIBDRM="$(find "$STAGING_DIR/usr/lib" -maxdepth 1 -type f -name 'libdrm.so.*' -print | sort | head -1)"
+          if [ -z "$REAL_LIBDRM" ]; then
+            echo 'LIBDRM_MISSING=real shared library' | tee -a "$LOG"
+            VERIFY_RC=1
+          else
+            echo "REAL_LIBDRM=$REAL_LIBDRM" | tee -a "$LOG"
+            file "$REAL_LIBDRM" | tee -a "$LOG" || true
+            echo '=== LIBDRM DT_NEEDED ===' | tee -a "$LOG"
+            "$TARGET_READELF" -d "$REAL_LIBDRM" 2>/dev/null | grep NEEDED | tee -a "$LOG" || true
+            if "$TARGET_READELF" -d "$REAL_LIBDRM" 2>/dev/null | grep -q 'libudev'; then
+              echo 'LIBDRM_ABI_ERROR=unexpected libudev dependency' | tee -a "$LOG"
+              VERIFY_RC=2
+            fi
+
+            echo '=== LIBDRM ARM ATTRIBUTES ===' | tee -a "$LOG"
+            "$TARGET_READELF" -A "$REAL_LIBDRM" 2>/dev/null | tee -a "$LOG" || true
+
+            MAX_GLIBC="$("$TARGET_READELF" --version-info "$REAL_LIBDRM" 2>/dev/null | grep -oE 'GLIBC_[0-9]+\.[0-9]+' | sort -Vu | tail -1 || true)"
+            echo "LIBDRM_MAX_GLIBC=$MAX_GLIBC" | tee -a "$LOG"
+            if [ -n "$MAX_GLIBC" ]; then
+              HIGHEST="$(printf '%s\n' GLIBC_2.14 "$MAX_GLIBC" | sort -V | tail -1)"
+              if [ "$HIGHEST" != "GLIBC_2.14" ]; then
+                echo "LIBDRM_ABI_ERROR=requires newer than GLIBC_2.14:$MAX_GLIBC" | tee -a "$LOG"
+                VERIFY_RC=3
+              fi
+            fi
+          fi
+
+          export PKG_CONFIG_SYSROOT_DIR="$STAGING_DIR"
+          export PKG_CONFIG_LIBDIR="$STAGING_DIR/usr/lib/pkgconfig:$STAGING_DIR/usr/share/pkgconfig"
+          LIBDRM_VERSION="$(/usr/bin/pkg-config --modversion libdrm 2>/dev/null || true)"
+          echo "LIBDRM_VERSION=$LIBDRM_VERSION" | tee -a "$LOG"
+          if [ "$LIBDRM_VERSION" != "2.4.124" ]; then
+            VERIFY_RC=4
+          fi
+
+          echo "LIBDRM_BUILD_RC=$VERIFY_RC" | tee -a "$LOG"
+          echo "LIBDRM_BUILD_RC=$VERIFY_RC" >> "$GITHUB_ENV"
+          echo "libdrm_rc=$VERIFY_RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate combined NSS and libdrm target ABI
+        id: combined_probe
+        if: ${{ steps.libdrm.conclusion == 'success' && steps.libdrm.outputs.libdrm_rc == '0' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/combined-sysdeps-probe.log"
+          BUILDROOT_OUT="$RUNNER_TEMP/buildroot-nss-out"
+          TARGET_CC="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-gcc"
+          TARGET_READELF="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-readelf"
+          STAGING_DIR="$($TARGET_CC --print-sysroot 2>/dev/null || true)"
+
+          export PKG_CONFIG_SYSROOT_DIR="$STAGING_DIR"
+          export PKG_CONFIG_LIBDIR="$STAGING_DIR/usr/lib/pkgconfig:$STAGING_DIR/usr/share/pkgconfig"
+
+          cat > "$RUNNER_TEMP/lgwos-combined-probe.c" <<'EOF'
+          #include <nss.h>
+          #include <xf86drm.h>
+          int main(void) {
+            drmVersionPtr version = drmGetVersion(-1);
+            if (version) drmFreeVersion(version);
+            return NSS_VersionCheck("3.0") ? 0 : 1;
+          }
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/lgwos-combined-probe.c"
+
+          CFLAGS="$(/usr/bin/pkg-config --cflags nss libdrm 2>/dev/null || true)"
+          LIBS="$(/usr/bin/pkg-config --libs nss libdrm 2>/dev/null || true)"
+
+          set +e
+          "$TARGET_CC" $CFLAGS "$RUNNER_TEMP/lgwos-combined-probe.c" $LIBS \
+            -o "$RUNNER_TEMP/lgwos-combined-probe" \
+            2>&1 | tee "$LOG"
+          RC=${PIPESTATUS[0]}
+          set -e
+
+          echo "COMBINED_LINK_RC=$RC" | tee -a "$LOG"
+          file "$RUNNER_TEMP/lgwos-combined-probe" 2>/dev/null | tee -a "$LOG" || true
+          "$TARGET_READELF" -d "$RUNNER_TEMP/lgwos-combined-probe" 2>/dev/null | grep NEEDED | tee -a "$LOG" || true
+
+          echo "COMBINED_LINK_RC=$RC" >> "$GITHUB_ENV"
+          echo "combined_probe_rc=$RC" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Save upgraded sysdeps checkpoint
+        if: ${{ steps.combined_probe.conclusion == 'success' && steps.combined_probe.outputs.combined_probe_rc == '0' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/buildroot-nss-out
+          key: lgwos-${{ env.SYSDEPS_CHECKPOINT_SCHEMA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ env.BUILDROOT_REF }}
+
+      - name: Dispatch Chromium incremental V2
+        if: ${{ steps.combined_probe.conclusion == 'success' && steps.combined_probe.outputs.combined_probe_rc == '0' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          curl -fL \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/lgwos-chr120-incremental-v2.yml/dispatches" \
+            -d '{"ref":"master"}'
+
+      - name: Final repair summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "NSS_CACHE_HIT=${{ steps.nss_cache.outputs.cache-hit }}"
+            echo "NSS_VALIDATE_RC=${NSS_VALIDATE_RC:-NOT_RUN}"
+            echo "LIBDRM_BUILD_RC=${LIBDRM_BUILD_RC:-NOT_RUN}"
+            echo "COMBINED_LINK_RC=${COMBINED_LINK_RC:-NOT_RUN}"
+            df -h /
+            find "$GITHUB_WORKSPACE/lgwos-logs" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort || true
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/final-summary.log"
+
+      - name: Upload repair logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lgwos-libdrm-checkpoint-fix-v3-logs
+          path: lgwos-logs/
+          if-no-files-found: warn
+          retention-days: 14
