@@ -461,8 +461,27 @@ jobs:
             exit 0
           fi
 
-          STAGING_DIR="$(readlink -f "$BUILDROOT_OUT/staging")"
+          BUILDROOT_TARGET_CC="$BUILDROOT_OUT/host/bin/arm-webos-linux-gnueabi-gcc"
+
+          if [ ! -x "$BUILDROOT_TARGET_CC" ]; then
+            echo "BUILDROOT_TARGET_CC_MISSING=$BUILDROOT_TARGET_CC" | tee -a "$LOG"
+            echo 'NSS_AUGMENT_RC=91' >> "$GITHUB_ENV"
+            echo 'nss_augment_rc=91' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          STAGING_DIR="$($BUILDROOT_TARGET_CC --print-sysroot 2>/dev/null || true)"
+
+          echo "BUILDROOT_TARGET_CC=$BUILDROOT_TARGET_CC" | tee -a "$LOG"
           echo "NSS_BUILD_STAGING=$STAGING_DIR" | tee -a "$LOG"
+          ls -ld "$BUILDROOT_OUT/staging" "$STAGING_DIR" 2>/dev/null | tee -a "$LOG" || true
+
+          if [ -z "$STAGING_DIR" ] || [ ! -d "$STAGING_DIR/usr/lib" ]; then
+            echo "BUILDROOT_STAGING_INVALID=$STAGING_DIR" | tee -a "$LOG"
+            echo 'NSS_AUGMENT_RC=92' >> "$GITHUB_ENV"
+            echo 'nss_augment_rc=92' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
           VERIFY_RC=0
           for F in \
