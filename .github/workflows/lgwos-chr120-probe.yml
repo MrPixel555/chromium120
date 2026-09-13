@@ -142,6 +142,9 @@ jobs:
           set -euxo pipefail
           . "$SDK_ENV"
 
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          echo "TARGET_SYSROOT=$TARGET_SYSROOT" >> "$GITHUB_ENV"
+
           {
             echo "CC=$CC"
             echo "CXX=$CXX"
@@ -152,12 +155,54 @@ jobs:
             echo "CXX_PATH=$(command -v ${CXX%% *})"
             ${CC%% *} --version
             ${CXX%% *} --version
-            echo "SYSROOT=$(${CC%% *} --print-sysroot)"
+            echo "SYSROOT=$TARGET_SYSROOT"
             echo '--- target macros ---'
             printf '' | ${CC%% *} -dM -E - | grep -E '__arm__|__ARM_ARCH|__SOFTFP__|__ARM_PCS|__GNUC__' | sort || true
             echo '--- disk ---'
             df -h /
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/sdk-abi.log"
+
+      - name: Audit target pkg-config metadata
+        shell: bash
+        run: |
+          set -uo pipefail
+          . "$SDK_ENV"
+
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
+          TARGET_PKG_CONFIG_LIBDIR="$TARGET_SYSROOT/usr/lib/pkgconfig:$TARGET_SYSROOT/usr/share/pkgconfig"
+
+          {
+            echo "TARGET_SYSROOT=$TARGET_SYSROOT"
+            echo "TARGET_PKG_CONFIG=/usr/bin/pkg-config"
+            echo "TARGET_PKG_CONFIG_LIBDIR=$TARGET_PKG_CONFIG_LIBDIR"
+            echo '--- pkg-config files of interest ---'
+            find "$TARGET_SYSROOT" -type f \( \
+              -name 'nss.pc' -o \
+              -name 'nspr.pc' -o \
+              -name 'openssl.pc' -o \
+              -name 'wayland-client.pc' -o \
+              -name 'wayland-webos-client.pc' \
+            \) -print | sort || true
+
+            echo '--- target pkg-config probes ---'
+            export PKG_CONFIG_SYSROOT_DIR="$TARGET_SYSROOT"
+            export PKG_CONFIG_LIBDIR="$TARGET_PKG_CONFIG_LIBDIR"
+
+            for P in nss nspr openssl wayland-client wayland-webos-client; do
+              printf '%s=' "$P"
+              /usr/bin/pkg-config --modversion "$P" 2>/dev/null || echo NOT_FOUND
+            done
+
+            echo '--- pkg-config search directories present ---'
+            for D in "$TARGET_SYSROOT/usr/lib/pkgconfig" "$TARGET_SYSROOT/usr/share/pkgconfig"; do
+              if [ -d "$D" ]; then
+                echo "DIR_OK=$D"
+                find "$D" -maxdepth 1 -type f -name '*.pc' | wc -l
+              else
+                echo "DIR_MISSING=$D"
+              fi
+            done
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/target-pkg-config.log"
 
       - name: Audit Chromium build tools
         shell: bash
@@ -196,6 +241,7 @@ jobs:
           TARGET_AR="$(command -v ${AR%% *})"
           TARGET_LD="$(command -v ${LD%% *})"
           TARGET_NM="$(command -v ${NM%% *})"
+          TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
 
           HOST_CC="$(command -v gcc)"
           HOST_CXX="$(command -v g++)"
@@ -216,6 +262,9 @@ jobs:
           arm_version=7
           arm_float_abi="softfp"
           use_sysroot=false
+          target_sysroot="$TARGET_SYSROOT"
+          system_libdir="lib"
+          pkg_config="/usr/bin/pkg-config"
           use_custom_libcxx=false
           host_toolchain="//build/toolchain/cros:host"
           cros_host_ar="$HOST_AR"
