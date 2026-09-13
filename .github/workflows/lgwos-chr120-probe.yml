@@ -21,6 +21,8 @@ env:
   WEBOS_SDK_SHA256: 04ad3311b48b4557a7002aef56ae2e167478e8e129f37daac04649bddf813616
   BUILDROOT_REF: a38c582ea397fec612811f8e933ae982d41fc5a3
   OUT_DIR: out/LGWOS-Probe
+  NSS_CHECKPOINT_SCHEMA: nss-v1
+  CHROMIUM_CHECKPOINT_SCHEMA: chromium-out-v1
 
 jobs:
   probe:
@@ -288,6 +290,13 @@ jobs:
             done
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/target-pkg-config-before.log"
 
+      - name: Restore NSS Buildroot checkpoint
+        id: nss_checkpoint_restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/buildroot-nss-out
+          key: lgwos-${{ env.NSS_CHECKPOINT_SCHEMA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ env.BUILDROOT_REF }}
+
       - name: Build and inject ABI-compatible NSPR and NSS
         id: nss_augment
         shell: bash
@@ -302,12 +311,13 @@ jobs:
           TARGET_SYSROOT="$(${CC%% *} --print-sysroot)"
           LOG="$GITHUB_WORKSPACE/lgwos-logs/nss-build.log"
 
-          rm -rf "$BUILDROOT_SRC" "$BUILDROOT_OUT" "$BUILDROOT_TARBALL"
+          rm -rf "$BUILDROOT_SRC" "$BUILDROOT_TARBALL"
           mkdir -p "$BUILDROOT_SRC" "$BUILDROOT_OUT"
 
           echo '=== FETCH EXACT BUILDROOT SOURCE ===' | tee "$LOG"
           echo "BUILDROOT_REF=$BUILDROOT_REF" | tee -a "$LOG"
           echo "LGWOS_SECURE_GETENV_MODE=${LGWOS_SECURE_GETENV_MODE:-UNSET}" | tee -a "$LOG"
+          echo "NSS_CHECKPOINT_RESTORED=${{ steps.nss_checkpoint_restore.outputs.cache-hit }}" | tee -a "$LOG"
 
           if [ "${LGWOS_SECURE_GETENV_MODE:-unavailable}" = "unavailable" ]; then
             echo 'NSS_COMPAT_ERROR=no secure getenv ABI available' | tee -a "$LOG"
@@ -596,6 +606,13 @@ jobs:
           df -h / | tee -a "$LOG"
           exit 0
 
+      - name: Save NSS Buildroot checkpoint
+        if: ${{ steps.nss_augment.conclusion == 'success' && steps.nss_augment.outputs.nss_augment_rc == '0' && steps.nss_checkpoint_restore.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/buildroot-nss-out
+          key: lgwos-${{ env.NSS_CHECKPOINT_SCHEMA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ env.BUILDROOT_REF }}
+
       - name: Audit target pkg-config metadata after augmentation
         if: ${{ steps.nss_augment.conclusion == 'success' && steps.nss_augment.outputs.nss_augment_rc == '0' }}
         shell: bash
@@ -645,6 +662,16 @@ jobs:
             echo '--- disk ---'
             df -h /
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/build-tools.log"
+
+      - name: Restore Chromium incremental build checkpoint
+        id: chromium_checkpoint_restore
+        if: ${{ steps.nss_augment.conclusion == 'success' && steps.nss_augment.outputs.nss_augment_rc == '0' }}
+        uses: actions/cache/restore@v4
+        with:
+          path: src/out/LGWOS-Probe
+          key: lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ github.run_id }}
+          restore-keys: |
+            lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-
 
       - name: Generate LGWOS GN build graph
         id: gn_gen
@@ -719,6 +746,7 @@ jobs:
 
           echo '=== GN ARGS ===' | tee "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
           cat "$ARGS_FILE" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
+          echo "CHROMIUM_CHECKPOINT_MATCHED=${{ steps.chromium_checkpoint_restore.outputs.cache-matched-key }}" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
           echo '=== GN GEN ===' | tee -a "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log"
 
           set +e
@@ -768,6 +796,40 @@ jobs:
           df -h / | tee -a "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
           exit 0
 
+      - name: Assess Chromium checkpoint size
+        id: chromium_checkpoint_size
+        if: ${{ always() && steps.gn_gen.conclusion == 'success' && steps.gn_gen.outputs.gn_rc == '0' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          OUT_PATH="$GITHUB_WORKSPACE/src/$OUT_DIR"
+          LIMIT_KB=$((8 * 1024 * 1024))
+
+          if [ ! -d "$OUT_PATH" ]; then
+            echo 'checkpoint_save_ok=false' >> "$GITHUB_OUTPUT"
+            echo 'CHROMIUM_CHECKPOINT_SAVE=NO_OUT_DIR'
+            exit 0
+          fi
+
+          SIZE_KB="$(du -sk "$OUT_PATH" | awk '{print $1}')"
+          echo "CHROMIUM_CHECKPOINT_SIZE_KB=$SIZE_KB"
+          echo "CHROMIUM_CHECKPOINT_LIMIT_KB=$LIMIT_KB"
+
+          if [ "$SIZE_KB" -le "$LIMIT_KB" ]; then
+            echo 'checkpoint_save_ok=true' >> "$GITHUB_OUTPUT"
+            echo 'CHROMIUM_CHECKPOINT_SAVE=YES'
+          else
+            echo 'checkpoint_save_ok=false' >> "$GITHUB_OUTPUT"
+            echo 'CHROMIUM_CHECKPOINT_SAVE=SKIPPED_TOO_LARGE'
+          fi
+
+      - name: Save Chromium incremental build checkpoint
+        if: ${{ always() && steps.gn_gen.conclusion == 'success' && steps.gn_gen.outputs.gn_rc == '0' && steps.chromium_checkpoint_size.outputs.checkpoint_save_ok == 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: src/out/LGWOS-Probe
+          key: lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ github.run_id }}
+
       - name: Final probe summary
         if: always()
         shell: bash
@@ -776,6 +838,8 @@ jobs:
             echo "HEAD=$(git rev-parse HEAD 2>/dev/null || true)"
             echo "LGWOS_SECURE_GETENV_MODE=${LGWOS_SECURE_GETENV_MODE:-NOT_RUN}"
             echo "NSS_AUGMENT_RC=${NSS_AUGMENT_RC:-NOT_RUN}"
+            echo "NSS_CHECKPOINT_HIT=${{ steps.nss_checkpoint_restore.outputs.cache-hit }}"
+            echo "CHROMIUM_CHECKPOINT_MATCHED=${{ steps.chromium_checkpoint_restore.outputs.cache-matched-key }}"
             echo "GN_RC=${GN_RC:-NOT_RUN}"
             echo "BASE_BUILD_RC=${BASE_BUILD_RC:-NOT_RUN}"
             echo '--- disk ---'
