@@ -50,9 +50,10 @@ jobs:
           echo '=== DISK AFTER CLEANUP ==='
           df -h /
 
-      - name: Checkout Chromium 120 fork
+      - name: Checkout exact Chromium 120 source commit
         uses: actions/checkout@v4
         with:
+          ref: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
           fetch-depth: 1
           submodules: false
           lfs: false
