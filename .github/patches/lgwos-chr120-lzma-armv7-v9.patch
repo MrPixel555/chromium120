@@ -55,7 +55,7 @@ diff --git a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc b/src/
 diff --git a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc b/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
 --- a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
 +++ b/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
-@@ -17,6 +17,10 @@
+@@ -17,7 +17,11 @@
  #include <errno.h>
  #include <linux/elf.h>
  #include <string.h>
