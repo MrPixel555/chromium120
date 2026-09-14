@@ -379,6 +379,20 @@ jobs:
           echo "BASE_BUILD_RC=$RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
           exit "$RC"
 
+      - name: Build webOS web runtime
+        shell: bash
+        run: |
+          set -o pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          set +e
+          timeout 60m ninja -C "$OUT_DIR" -j2 webos:weboswebruntime \
+            2>&1 | tee "$GITHUB_WORKSPACE/lgwos-logs/weboswebruntime-build.log"
+          RC=${PIPESTATUS[0]}
+          set -e
+          echo "WEBOSWEBRUNTIME_BUILD_RC=$RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/weboswebruntime-build.log"
+          exit "$RC"
+
       - name: Save Chromium incremental checkpoint
         if: always()
         uses: actions/cache/save@v4
@@ -397,6 +411,7 @@ jobs:
             echo "CHROMIUM_CACHE_HIT=${{ steps.chromium_cache.outputs.cache-hit }}"
             grep -h '^GN_RC=' "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log" 2>/dev/null || true
             grep -h '^BASE_BUILD_RC=' "$GITHUB_WORKSPACE/lgwos-logs/base-build.log" 2>/dev/null || true
+            grep -h '^WEBOSWEBRUNTIME_BUILD_RC=' "$GITHUB_WORKSPACE/lgwos-logs/weboswebruntime-build.log" 2>/dev/null || true
             df -h /
             find "$GITHUB_WORKSPACE/lgwos-logs" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
           } | tee "$GITHUB_WORKSPACE/lgwos-logs/final-summary.log"
