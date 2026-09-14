@@ -133,3 +133,13 @@ diff --git a/src/build/toolchain/cros/BUILD.gn b/src/build/toolchain/cros/BUILD.
 +    ld = cros_target_cxx
  
      if (cros_target_nm != "") {
+diff --git a/src/build/toolchain/linux/BUILD.gn b/src/build/toolchain/linux/BUILD.gn
+--- a/src/build/toolchain/linux/BUILD.gn
++++ b/src/build/toolchain/linux/BUILD.gn
+@@ -168,5 +168,6 @@ clang_v8_toolchain("clang_x86_v8_arm") {
+   toolchain_args = {
+     current_cpu = "x86"
++    use_custom_libcxx = true
+     v8_current_cpu = "arm"
+   }
+ }
