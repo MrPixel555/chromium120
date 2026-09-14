@@ -1,0 +1,892 @@
+LGWOS Chromium120 V8 Post-Run Diagnostic
+SOURCE_RUN_ID=34866107063
+SOURCE_CONCLUSION=failure
+SOURCE_HEAD_SHA=7fdbe3f0ba5abf798fd179afc1f8b01384160cde
+CAPTURED_UTC=2026-09-14T16:23:29Z
+ARTIFACT_ID=10357717570
+
+===== FINAL SUMMARY =====
+HEAD=e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+SYSDEPS_CACHE_HIT=true
+CHROMIUM_CACHE_HIT=false
+GN_RC=0
+WEBOSWEBRUNTIME_BUILD_RC=1
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       146G   53G   93G  37% /
+
+===== RUNNER CAPACITY =====
+CPU_JOBS=4
+MEM_KB=16372472
+MEM_JOBS=9
+NINJA_JOBS=4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       592Mi       1.7Gi        32Mi        13Gi        14Gi
+Swap:          3.0Gi       148Mi       2.9Gi
+
+===== MTIME NORMALIZATION =====
+LGWOS_TARGET_SHA=e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+COMMIT_EPOCH=1738743733
+NORMALIZED_UTC=2025-02-05T08:22:13Z
+
+===== INCREMENTAL AUDIT =====
+NINJA_DRY_RUN_RC=0
+DIRTY_REASON_COUNT=512668
+ninja explain: deps for 'obj/webos/webos_impl/webapp_window_base_agl_stub.o' are missing
+ninja explain: output host/obj/third_party/zlib/zlib/cpu_features.o older than most recent input ../../third_party/zlib/cpu_features.c (1789391891708486017 vs 1789402086217881597)
+ninja explain: host/obj/third_party/zlib/zlib/cpu_features.o is dirty
+ninja explain: host/obj/third_party/zlib/libchrome_zlib.a is dirty
+ninja explain: host/protoc is dirty
+ninja explain: host/protoc is dirty
+ninja explain: gen/base/tracing/protos/chrome_track_event.descriptor is dirty
+ninja explain: obj/base/tracing/protos/chrome_track_event_gen.stamp is dirty
+ninja explain: depfile 'gen/base/tracing/protos/chrome_track_event_resources_grit.d' is missing
+ninja explain: depfile 'gen/tools/gritsettings/default_resource_ids.d' is missing
+ninja explain: depfile 'obj/tools/grit/grit_sources.d' is missing
+ninja explain: obj/tools/grit/grit_sources.script.stamp is dirty
+ninja explain: obj/tools/grit/grit_sources.stamp is dirty
+ninja explain: gen/tools/gritsettings/default_resource_ids is dirty
+ninja explain: obj/base/tracing/protos/chrome_track_event_gen.stamp is dirty
+ninja explain: obj/base/tracing/protos/chrome_track_event.stamp is dirty
+ninja explain: obj/tools/grit/grit_sources.stamp is dirty
+ninja explain: gen/tools/gritsettings/default_resource_ids is dirty
+ninja explain: obj/tools/gritsettings/default_resource_ids.stamp is dirty
+ninja explain: gen/base/tracing/protos/chrome_track_event_resources_grit.d.stamp is dirty
+ninja explain: gen/base/tracing/protos/grit/tracing_proto_resources.h is dirty
+ninja explain: gen/base/tracing/protos/tracing_proto_resources.pak is dirty
+ninja explain: gen/base/tracing/protos/tracing_proto_resources.pak.info is dirty
+ninja explain: obj/base/tracing/protos/chrome_track_event_resources_grit.stamp is dirty
+ninja explain: host/protoc is dirty
+ninja explain: host/obj/third_party/zlib/libchrome_zlib.a is dirty
+ninja explain: host/protozero_plugin is dirty
+ninja explain: host/protozero_plugin is dirty
+ninja explain: host/protoc is dirty
+ninja explain: gen/base/tracing/protos/chrome_track_event.pbzero.h is dirty
+ninja explain: gen/base/tracing/protos/chrome_track_event.pbzero.cc is dirty
+ninja explain: obj/base/tracing/protos/chrome_track_event_zero_gen.stamp is dirty
+ninja explain: output gen/ui/gfx/geometry/mojom/geometry.mojom-module doesn't exist
+ninja explain: gen/ui/gfx/geometry/mojom/geometry.mojom-module is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: output gen/ui/gfx/mojom/hdr_metadata.mojom-module doesn't exist
+ninja explain: gen/ui/gfx/mojom/hdr_metadata.mojom-module is dirty
+ninja explain: obj/ui/gfx/mojom/hdr_metadata__parser.stamp is dirty
+ninja explain: output gen/ui/gfx/mojom/native_handle_types.mojom-module doesn't exist
+ninja explain: gen/ui/gfx/mojom/native_handle_types.mojom-module is dirty
+ninja explain: obj/ui/gfx/mojom/native_handle_types__parser.stamp is dirty
+ninja explain: gen/ui/gfx/mojom/accelerated_widget.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/buffer_types.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/ca_layer_params.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/color_space.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/delegated_ink_metadata.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/delegated_ink_point.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/delegated_ink_point_renderer.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/display_color_spaces.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/font_render_params.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/frame_data.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/gpu_extra_info.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/gpu_fence_handle.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/hdr_static_metadata.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/linear_gradient.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/mask_filter_info.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/overlay_priority_hint.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/overlay_transform.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/presentation_feedback.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/rrect_f.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/selection_bound.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/swap_result.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/swap_timings.mojom-module is dirty
+ninja explain: gen/ui/gfx/mojom/transform.mojom-module is dirty
+ninja explain: obj/ui/gfx/mojom/mojom__parser.stamp is dirty
+ninja explain: gen/gpu/ipc/common/client_gmb_interface.mojom-module is dirty
+ninja explain: obj/gpu/ipc/common/gmb_interface__parser.stamp is dirty
+ninja explain: obj/ui/gfx/mojom/mojom__parser.stamp is dirty
+ninja explain: gen/gpu/ipc/common/gpu_preferences.mojom-module is dirty
+ninja explain: obj/gpu/ipc/common/gpu_preferences_interface__parser.stamp is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: obj/ui/gfx/mojom/mojom__parser.stamp is dirty
+ninja explain: output gen/ui/gl/mojom/gl_implementation.mojom-module doesn't exist
+ninja explain: gen/ui/gl/mojom/gl_implementation.mojom-module is dirty
+ninja explain: gen/ui/gl/mojom/gpu_preference.mojom-module is dirty
+ninja explain: obj/ui/gl/mojom/mojom__parser.stamp is dirty
+ninja explain: gen/gpu/ipc/common/capabilities.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/context_result.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/device_perf_info.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/dx_diag_node.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/gpu_disk_cache_type.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/gpu_feature_info.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/gpu_info.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/gpu_peak_memory.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/mailbox.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/mailbox_holder.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/memory_stats.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/shared_image_capabilities.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/sync_token.mojom-module is dirty
+ninja explain: gen/gpu/ipc/common/vulkan_ycbcr_info.mojom-module is dirty
+ninja explain: obj/gpu/ipc/common/interfaces__parser.stamp is dirty
+ninja explain: obj/gpu/ipc/common/interfaces__parser.stamp is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: gen/media/mojo/mojom/speech_recognition.mojom-module is dirty
+ninja explain: obj/media/mojo/mojom/speech_recognition__parser.stamp is dirty
+ninja explain: obj/gpu/ipc/common/interfaces__parser.stamp is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: obj/ui/gfx/mojom/mojom__parser.stamp is dirty
+ninja explain: gen/media/mojo/mojom/stable/stable_video_decoder.mojom-module is dirty
+ninja explain: gen/media/mojo/mojom/stable/stable_video_decoder_types.mojom-module is dirty
+ninja explain: obj/media/mojo/mojom/stable/stable_video_decoder__parser.stamp is dirty
+ninja explain: obj/ui/gfx/geometry/mojom/mojom__parser.stamp is dirty
+ninja explain: output gen/url/mojom/url.mojom-module doesn't exist
+ninja explain: gen/url/mojom/url.mojom-module is dirty
+ninja explain: obj/url/mojom/url_mojom_gurl__parser.stamp is dirty
+ninja explain: gen/services/media_session/public/mojom/audio_focus.mojom-module is dirty
+ninja explain: gen/services/media_session/public/mojom/constants.mojom-module is dirty
+ninja explain: gen/services/media_session/public/mojom/media_controller.mojom-module is dirty
+ninja explain: gen/services/media_session/public/mojom/media_session.mojom-module is dirty
+ninja explain: obj/services/media_session/public/mojom/mojom__parser.stamp is dirty
+ninja explain: obj/url/mojom/url_mojom_gurl__parser.stamp is dirty
+ninja explain: gen/url/mojom/origin.mojom-module is dirty
+ninja explain: obj/url/mojom/url_mojom_origin__parser.stamp is dirty
+ninja explain: gen/services/network/public/mojom/schemeful_site.mojom-module is dirty
+ninja explain: obj/services/network/public/mojom/mojom_schemeful_site__parser.stamp is dirty
+ninja explain: gen/services/network/public/mojom/first_party_sets.mojom-module is dirty
+ninja explain: obj/services/network/public/mojom/mojom_first_party_sets__parser.stamp is dirty
+ninja explain: obj/services/network/public/mojom/mojom_schemeful_site__parser.stamp is dirty
+ninja explain: obj/url/mojom/url_mojom_gurl__parser.stamp is dirty
+[46070/46109  99% | active=2 | elapsed=8.926s | rate=5161.3/s] AR obj/third_party/blink/renderer/modules/webaudio/libwebaudio.a
+[46071/46109  99% | active=2 | elapsed=8.926s | rate=5161.4/s] AR obj/third_party/blink/renderer/modules/service_worker/libservice_worker.a
+[46072/46109  99% | active=1 | elapsed=8.926s | rate=5161.6/s] AR obj/third_party/blink/renderer/modules/webcodecs/libwebcodecs.a
+[46073/46109  99% | active=5 | elapsed=8.926s | rate=5161.7/s] AR obj/third_party/blink/renderer/modules/breakout_box/libbreakout_box.a
+[46074/46109  99% | active=4 | elapsed=8.926s | rate=5161.8/s] AR obj/third_party/blink/renderer/modules/canvas/libcanvas.a
+[46075/46109  99% | active=5 | elapsed=8.927s | rate=5161.3/s] AR obj/third_party/blink/renderer/modules/mediasource/libmediasource.a
+[46076/46109  99% | active=5 | elapsed=8.927s | rate=5161.4/s] AR obj/third_party/blink/renderer/modules/webgl/libwebgl.a
+[46077/46109  99% | active=4 | elapsed=8.927s | rate=5161.5/s] AR obj/third_party/blink/renderer/modules/webgpu/libwebgpu.a
+[46078/46109  99% | active=3 | elapsed=8.927s | rate=5161.6/s] AR obj/third_party/blink/renderer/modules/csspaint/libcsspaint.a
+[46079/46109  99% | active=3 | elapsed=8.927s | rate=5161.8/s] AR obj/third_party/blink/renderer/modules/shapedetection/libshapedetection.a
+[46080/46109  99% | active=2 | elapsed=8.927s | rate=5161.9/s] AR obj/third_party/blink/renderer/modules/srcobject/libsrcobject.a
+[46081/46109  99% | active=1 | elapsed=8.927s | rate=5162.0/s] AR obj/third_party/blink/renderer/modules/worklet/libworklet.a
+[46082/46109  99% | active=1 | elapsed=8.927s | rate=5162.1/s] AR obj/third_party/blink/renderer/modules/libblink_modules.a
+[46083/46109  99% | active=1 | elapsed=8.927s | rate=5162.2/s] AR obj/third_party/blink/renderer/controller/libblink_controller.a
+[46084/46109  99% | active=1 | elapsed=8.928s | rate=5161.7/s] STAMP obj/third_party/blink/public/blink.stamp
+[46085/46109  99% | active=4 | elapsed=8.928s | rate=5161.9/s] STAMP obj/content/ppapi_plugin/ppapi_plugin_sources.stamp
+[46086/46109  99% | active=3 | elapsed=8.928s | rate=5162.0/s] STAMP obj/neva/injection/renderer/renderer.stamp
+[46087/46109  99% | active=3 | elapsed=8.928s | rate=5162.1/s] STAMP obj/services/data_decoder/lib.stamp
+[46088/46109  99% | active=3 | elapsed=8.928s | rate=5162.2/s] AR obj/third_party/blink/renderer/platform/media/libblink_platform_media.a
+[46089/46109  99% | active=3 | elapsed=8.928s | rate=5162.3/s] STAMP obj/neva/injection/public/renderer/renderer.stamp
+[46090/46109  99% | active=2 | elapsed=8.928s | rate=5162.4/s] STAMP obj/content/utility/utility.stamp
+[46091/46109  99% | active=2 | elapsed=8.928s | rate=5162.5/s] STAMP obj/third_party/blink/public/platform/media/media.stamp
+[46092/46109  99% | active=2 | elapsed=8.928s | rate=5162.6/s] STAMP obj/content/public/utility/utility_sources.stamp
+[46093/46109  99% | active=1 | elapsed=8.928s | rate=5162.7/s] AR obj/content/renderer/librenderer.a
+[46094/46109  99% | active=1 | elapsed=8.928s | rate=5162.9/s] AR obj/content/public/renderer/librenderer_sources.a
+[46095/46109  99% | active=3 | elapsed=8.928s | rate=5163.0/s] STAMP obj/content/content.stamp
+[46096/46109  99% | active=2 | elapsed=8.928s | rate=5163.1/s] STAMP obj/content/app/content_main_runner_app.stamp
+[46097/46109  99% | active=2 | elapsed=8.928s | rate=5163.2/s] STAMP obj/content/public/renderer/renderer.stamp
+[46098/46109  99% | active=4 | elapsed=8.929s | rate=5162.7/s] STAMP obj/content/app/app.stamp
+[46099/46109  99% | active=4 | elapsed=8.929s | rate=5162.8/s] STAMP obj/components/cdm/renderer/neva/webos/webos.stamp
+[46100/46109  99% | active=4 | elapsed=8.929s | rate=5163.0/s] AR obj/components/guest_view/renderer/librenderer.a
+[46101/46109  99% | active=4 | elapsed=8.929s | rate=5163.1/s] AR obj/components/media_control/renderer/librenderer.a
+[46102/46109  99% | active=3 | elapsed=8.929s | rate=5163.2/s] STAMP obj/content/public/app/app.stamp
+[46103/46109  99% | active=2 | elapsed=8.929s | rate=5163.3/s] STAMP obj/components/cdm/renderer/neva/neva.stamp
+[46104/46109  99% | active=2 | elapsed=8.929s | rate=5163.4/s] STAMP obj/extensions/renderer/renderer.stamp
+[46105/46109  99% | active=2 | elapsed=8.929s | rate=5163.5/s] AR obj/components/cdm/renderer/librenderer.a
+[46106/46109  99% | active=1 | elapsed=8.929s | rate=5163.6/s] STAMP obj/neva/extensions/extensions.stamp
+[46107/46109  99% | active=1 | elapsed=8.929s | rate=5163.7/s] AR obj/neva/app_runtime/libapp_runtime.a
+[46108/46109  99% | active=1 | elapsed=8.929s | rate=5163.8/s] STAMP obj/webos/webos_impl.stamp
+[46109/46109 100% | active=1 | elapsed=8.933s | rate=5161.6/s] SOLINK ./libcbe.so
+
+===== GN GENERATION =====
+WARNING at the command-line "--args":34:19: Build argument has no effect.
+use_gnome_keyring=false
+                  ^----
+The variable "use_gnome_keyring" was set as a build argument
+but never appeared in a declare_args() block in any buildfile.
+
+To view all possible args, run "gn args --list <out_dir>"
+
+The build continued as if that argument was unspecified.
+
+Done. Made 20305 targets from 3528 files in 6455ms
+GN_RC=0
+
+===== FOCUSED BUILD FAILURE CONTEXT =====
+1691-[1436/46109   3% | active=4 | elapsed=624.108s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_err_str.o
+1692-[1437/46109   3% | active=4 | elapsed=624.115s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_unchange_data.o
+1693-[1438/46109   3% | active=4 | elapsed=624.136s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zAlloc.o
+1694-[1439/46109   3% | active=4 | elapsed=624.161s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zBuf.o
+1695-[1440/46109   3% | active=4 | elapsed=624.172s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_utf-8.o
+1696-[1441/46109   3% | active=4 | elapsed=624.198s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zCrc.o
+1697-[1442/46109   3% | active=4 | elapsed=624.240s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zCrcOpt.o
+1698-[1443/46109   3% | active=4 | elapsed=624.314s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zFile.o
+1699-[1444/46109   3% | active=4 | elapsed=624.364s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zStream.o
+1700-[1445/46109   3% | active=4 | elapsed=624.381s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zDec.o
+1701-[1446/46109   3% | active=4 | elapsed=624.393s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Alloc.o
+1702-[1447/46109   3% | active=4 | elapsed=624.458s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bra86.o
+1703-[1448/46109   3% | active=4 | elapsed=624.471s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bcj2.o
+1704-[1449/46109   3% | active=4 | elapsed=624.483s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bra.o
+1705-[1450/46109   3% | active=4 | elapsed=624.506s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o
+1706:FAILED: obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o 
+1707-../../../../../../../../opt/lgwos-sdk/arm-webos-linux-gnueabi_sdk-buildroot/bin/arm-webos-linux-gnueabi-gcc -MMD -MF obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o.d -DENABLE_BROWSER_CONTROL_WEBAPI=1 -DENABLE_SAMPLE_WEBAPI=1 -DENABLE_MEMORYMANAGER_WEBAPI=1 -DENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI=1 -DENABLE_PWA_MANAGER_WEBAPI=1 -DENABLE_WEBOS_SERVICE_BRIDGE_WEBAPI=1 -DENABLE_WEBOS_SYSTEM_WEBAPI=1 -DNEVA_DCHECK_ALWAYS_ON=1 -DOS_WEBOS=1 -DNEVA_VIDEO_HOLE=1 -DUSE_NEVA_APPRUNTIME=1 -DUSE_NEVA_MEDIA=1 -DUSE_NEVA_BROWSER_SERVICE=1 -DUSE_WEBRISK_SERVICE=1 -DENABLE_PINCH_TO_ZOOM=1 -DUSE_WEBRISK_DATABASE=1 -DUSE_NEVA_PUNCH_HOLE=1 -DUSE_NEVA_CDM=1 -DENABLE_WEBM_AUDIO_CODECS=1 -DENABLE_WEBM_VIDEO_CODECS=1 -DUSE_NEVA_SUSPEND_MEDIA_CAPTURE=1 -DUSE_FILESCHEME_CODECACHE=1 -DUSE_SINGLE_WINDOW_MODE=1 -DUSE_NEVA_CHROME_EXTENSIONS=1 -DWEBOS_SUBMISSION_NUMBER=0 -DUSE_UDEV -DUSE_AURA=1 -DUSE_GLIB=1 -DUSE_OZONE=1 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DCR_SYSROOT_KEY=20230611T210420Z-2 -DNDEBUG -DNVALGRIND -DDYNAMIC_ANNOTATIONS_ENABLED=0 -D_7ZIP_ST -D_7Z_NO_METHODS_FILTERS -D_LZMA_PROB32 -I../.. -Igen -I../../third_party/lzma_sdk -I../../third_party/lzma_sdk/C -Wno-unused-variable -fno-ident -fno-strict-aliasing -fstack-protector -funwind-tables -fPIC -pipe -pthread -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -mfpu=neon -mthumb -O2 -fdata-sections -ffunction-sections -fno-math-errno -fno-omit-frame-pointer -g0 -fvisibility=hidden -Wno-psabi -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-deprecated-declarations -Wno-comments -Wno-packed-not-aligned -Wno-attributes -Wno-missing-field-initializers -Wno-unused-parameter -Wno-psabi -std=gnu11 --sysroot=../../../../../../../../opt/lgwos-sdk/arm-webos-linux-gnueabi_sdk-buildroot/arm-webos-linux-gnueabi/sysroot -c ../../third_party/lzma_sdk/C/CpuArch.c -o obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o
+1708-../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_CRC32’:
+1709:../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+1710-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1711-      |                                                          ^~~~~~~~~
+1712-../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1713-  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+1714-      | ^~~~~~~~~~~~~~~~~~~
+1715-../../third_party/lzma_sdk/C/CpuArch.c:438:58: note: each undeclared identifier is reported only once for each function it appears in
+1716-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1717-      |                                                          ^~~~~~~~~
+1718-../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1719-  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+1720-      | ^~~~~~~~~~~~~~~~~~~
+1721:../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_CRC32’ undeclared (first use in this function)
+1722-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1723-      |                                                                        ^~~~~~~
+1724-../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1725-  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+1726-      | ^~~~~~~~~~~~~~~~~~~
+1727-../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_SHA1’:
+1728:../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+1729-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1730-      |                                                          ^~~~~~~~~
+1731-../../third_party/lzma_sdk/C/CpuArch.c:451:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1732-  451 | MY_HWCAP_CHECK_FUNC (SHA1)
+1733-      | ^~~~~~~~~~~~~~~~~~~
+1734:../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_SHA1’ undeclared (first use in this function); did you mean ‘HWCAP_FPA’?
+1735-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1736-      |                                                                        ^~~~~~~
+1737-../../third_party/lzma_sdk/C/CpuArch.c:451:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1738-  451 | MY_HWCAP_CHECK_FUNC (SHA1)
+1739-      | ^~~~~~~~~~~~~~~~~~~
+1740-../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_SHA2’:
+1741:../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+1742-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1743-      |                                                          ^~~~~~~~~
+1744-../../third_party/lzma_sdk/C/CpuArch.c:452:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1745-  452 | MY_HWCAP_CHECK_FUNC (SHA2)
+1746-      | ^~~~~~~~~~~~~~~~~~~
+1747:../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_SHA2’ undeclared (first use in this function); did you mean ‘HWCAP_FPA’?
+1748-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1749-      |                                                                        ^~~~~~~
+1750-../../third_party/lzma_sdk/C/CpuArch.c:452:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1751-  452 | MY_HWCAP_CHECK_FUNC (SHA2)
+1752-      | ^~~~~~~~~~~~~~~~~~~
+1753-../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_AES’:
+1754:../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+1755-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1756-      |                                                          ^~~~~~~~~
+1757-../../third_party/lzma_sdk/C/CpuArch.c:453:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1758-  453 | MY_HWCAP_CHECK_FUNC (AES)
+1759-      | ^~~~~~~~~~~~~~~~~~~
+1760:../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_AES’ undeclared (first use in this function); did you mean ‘HWCAP_TLS’?
+1761-  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+1762-      |                                                                        ^~~~~~~
+1763-../../third_party/lzma_sdk/C/CpuArch.c:453:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+1764-  453 | MY_HWCAP_CHECK_FUNC (AES)
+1765-      | ^~~~~~~~~~~~~~~~~~~
+1766-[1451/46109   3% | active=3 | elapsed=624.507s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/DllSecur.o
+1767-[1452/46109   3% | active=2 | elapsed=624.542s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Delta.o
+1768-[1453/46109   3% | active=1 | elapsed=624.756s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zArcIn.o
+1769:ninja: build stopped: subcommand failed.
+1770-WEBOSWEBRUNTIME_BUILD_RC=1
+
+===== BUILD LOG TAIL =====
+[932/46109   2% | active=4 | elapsed=572.479s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/encodetxb_neon.o
+[933/46109   2% | active=4 | elapsed=572.554s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/pickrst_neon.o
+[934/46109   2% | active=4 | elapsed=572.628s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/hybrid_fwd_txfm_neon.o
+[935/46109   2% | active=4 | elapsed=572.826s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/av1_k_means_neon.o
+[936/46109   2% | active=4 | elapsed=573.191s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/wedge_utils_neon.o
+[937/46109   2% | active=4 | elapsed=573.594s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/reconinter_enc_neon.o
+[938/46109   2% | active=4 | elapsed=574.292s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/temporal_filter_neon.o
+[939/46109   2% | active=4 | elapsed=574.785s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/av1_temporal_denoiser_neon.o
+[940/46109   2% | active=4 | elapsed=575.879s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/sadxd_neon.o
+[941/46109   2% | active=4 | elapsed=576.775s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/sad_neon.o
+[942/46109   2% | active=4 | elapsed=576.851s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/highbd_fwd_txfm_neon.o
+[943/46109   2% | active=4 | elapsed=577.383s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/masked_sad_neon.o
+[944/46109   2% | active=4 | elapsed=577.573s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/masked_sad4d_neon.o
+[945/46109   2% | active=4 | elapsed=578.201s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/variance_neon.o
+[946/46109   2% | active=4 | elapsed=578.607s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/hadamard_neon.o
+[947/46109   2% | active=4 | elapsed=579.001s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/avg_neon.o
+[948/46109   2% | active=4 | elapsed=579.537s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/obmc_sad_neon.o
+[949/46109   2% | active=4 | elapsed=579.900s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/sse_neon.o
+[950/46109   2% | active=4 | elapsed=580.417s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/sum_squares_neon.o
+[951/46109   2% | active=4 | elapsed=580.529s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/subpel_variance_neon.o
+[952/46109   2% | active=4 | elapsed=580.720s | rate=1.6/s] CC obj/third_party/libaom/libaom_intrinsics_neon/blk_sse_sum_neon.o
+[953/46109   2% | active=4 | elapsed=580.761s | rate=1.6/s] CC obj/third_party/libavif/libavif/alpha.o
+[954/46109   2% | active=4 | elapsed=580.867s | rate=1.6/s] CC obj/third_party/libavif/libavif/colr.o
+[955/46109   2% | active=4 | elapsed=580.927s | rate=1.6/s] CC obj/third_party/libavif/libavif/diag.o
+[956/46109   2% | active=4 | elapsed=581.020s | rate=1.6/s] CC obj/third_party/libavif/libavif/io.o
+[957/46109   2% | active=4 | elapsed=581.067s | rate=1.6/s] CC obj/third_party/libavif/libavif/mem.o
+[958/46109   2% | active=4 | elapsed=581.192s | rate=1.6/s] CC obj/third_party/libavif/libavif/avif.o
+[959/46109   2% | active=4 | elapsed=581.254s | rate=1.6/s] CC obj/third_party/libavif/libavif/rawdata.o
+[960/46109   2% | active=4 | elapsed=581.274s | rate=1.7/s] CC obj/third_party/libavif/libavif/obu.o
+[961/46109   2% | active=4 | elapsed=581.702s | rate=1.7/s] CC obj/third_party/libaom/libaom_intrinsics_neon/av1_fwd_txfm2d_neon.o
+[962/46109   2% | active=4 | elapsed=581.705s | rate=1.7/s] STAMP obj/third_party/libaom/libaom_intrinsics_neon.stamp
+[963/46109   2% | active=4 | elapsed=581.743s | rate=1.7/s] CC obj/third_party/libavif/libavif/reformat_libsharpyuv.o
+[964/46109   2% | active=4 | elapsed=582.076s | rate=1.7/s] CC obj/third_party/libavif/libavif/reformat_libyuv.o
+[965/46109   2% | active=4 | elapsed=582.142s | rate=1.7/s] CC obj/third_party/libavif/libavif/reformat.o
+[966/46109   2% | active=4 | elapsed=582.202s | rate=1.7/s] CC obj/third_party/libavif/libavif/scale.o
+[967/46109   2% | active=4 | elapsed=582.418s | rate=1.7/s] CC obj/third_party/libavif/libavif/utils.o
+[968/46109   2% | active=4 | elapsed=582.480s | rate=1.7/s] CC obj/third_party/libavif/libavif/stream.o
+[969/46109   2% | active=4 | elapsed=582.521s | rate=1.7/s] CC obj/third_party/libavif/libavif/codec_dav1d.o
+[970/46109   2% | active=4 | elapsed=582.983s | rate=1.7/s] CC obj/third_party/libavifinfo/libavifinfo/avifinfo.o
+[971/46109   2% | active=4 | elapsed=582.986s | rate=1.7/s] STAMP obj/third_party/libavifinfo/libavifinfo.stamp
+[972/46109   2% | active=4 | elapsed=583.479s | rate=1.7/s] CC obj/third_party/libavif/libavif/read.o
+[973/46109   2% | active=4 | elapsed=584.071s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/frame_buffer.o
+[974/46109   2% | active=4 | elapsed=584.146s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/buffer_pool.o
+[975/46109   2% | active=4 | elapsed=584.600s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/internal_frame_buffer_list.o
+[976/46109   2% | active=4 | elapsed=584.642s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/status_code.o
+[977/46109   2% | active=4 | elapsed=585.433s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/quantizer.o
+[978/46109   2% | active=4 | elapsed=585.985s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/symbol_decoder_context.o
+[979/46109   2% | active=4 | elapsed=586.070s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/constants.o
+[980/46109   2% | active=4 | elapsed=586.482s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/bit_reader.o
+[981/46109   2% | active=4 | elapsed=587.040s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/logging.o
+[982/46109   2% | active=4 | elapsed=587.498s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/obu_parser.o
+[983/46109   2% | active=4 | elapsed=587.629s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/raw_bit_reader.o
+[984/46109   2% | active=4 | elapsed=587.925s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/segmentation.o
+[985/46109   2% | active=4 | elapsed=588.343s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/segmentation_map.o
+[986/46109   2% | active=4 | elapsed=589.019s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/yuv_buffer.o
+[987/46109   2% | active=4 | elapsed=589.400s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/png.o
+[988/46109   2% | active=4 | elapsed=589.456s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngerror.o
+[989/46109   2% | active=4 | elapsed=589.615s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngmem.o
+[990/46109   2% | active=4 | elapsed=589.677s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngget.o
+[991/46109   2% | active=4 | elapsed=589.773s | rate=1.7/s] CXX obj/third_party/libgav1/libgav1_parser/warp_prediction.o
+[992/46109   2% | active=4 | elapsed=589.786s | rate=1.7/s] AR obj/third_party/libgav1/libgav1_parser.a
+[993/46109   2% | active=4 | elapsed=589.874s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngrio.o
+[994/46109   2% | active=4 | elapsed=590.088s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngpread.o
+[995/46109   2% | active=4 | elapsed=591.351s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngread.o
+[996/46109   2% | active=4 | elapsed=591.381s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngrutil.o
+[997/46109   2% | active=4 | elapsed=591.694s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngtrans.o
+[998/46109   2% | active=4 | elapsed=591.743s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngset.o
+[999/46109   2% | active=4 | elapsed=591.789s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngwio.o
+[1000/46109   2% | active=4 | elapsed=592.054s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngwtran.o
+[1001/46109   2% | active=4 | elapsed=592.412s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngrtran.o
+[1002/46109   2% | active=4 | elapsed=592.495s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/arm_init.o
+[1003/46109   2% | active=4 | elapsed=592.660s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngwrite.o
+[1004/46109   2% | active=4 | elapsed=592.824s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/filter_neon_intrinsics.o
+[1005/46109   2% | active=4 | elapsed=592.832s | rate=1.7/s] AR obj/third_party/libsecret/libsecret.a
+[1006/46109   2% | active=4 | elapsed=592.990s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/palette_neon_intrinsics.o
+[1007/46109   2% | active=4 | elapsed=593.062s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/aes_gcm_ossl.o
+[1008/46109   2% | active=4 | elapsed=593.117s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/aes_icm_ossl.o
+[1009/46109   2% | active=4 | elapsed=593.193s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/null_cipher.o
+[1010/46109   2% | active=4 | elapsed=593.218s | rate=1.7/s] CC obj/third_party/libpng/libpng_sources/pngwutil.o
+[1011/46109   2% | active=4 | elapsed=593.302s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/auth.o
+[1012/46109   2% | active=4 | elapsed=593.325s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/hmac_ossl.o
+[1013/46109   2% | active=4 | elapsed=593.380s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/null_auth.o
+[1014/46109   2% | active=4 | elapsed=593.398s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/alloc.o
+[1015/46109   2% | active=4 | elapsed=593.435s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/cipher.o
+[1016/46109   2% | active=4 | elapsed=593.477s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/err.o
+[1017/46109   2% | active=4 | elapsed=593.508s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/key.o
+[1018/46109   2% | active=4 | elapsed=593.596s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/crypto_kernel.o
+[1019/46109   2% | active=4 | elapsed=593.650s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/stat.o
+[1020/46109   2% | active=4 | elapsed=593.675s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/rdb.o
+[1021/46109   2% | active=4 | elapsed=593.695s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/datatypes.o
+[1022/46109   2% | active=4 | elapsed=593.769s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/rdbx.o
+[1023/46109   2% | active=4 | elapsed=593.779s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/ekt.o
+[1024/46109   2% | active=4 | elapsed=593.829s | rate=1.7/s] CC obj/third_party/libsync/libsync/strlcpy.o
+[1025/46109   2% | active=4 | elapsed=593.833s | rate=1.7/s] STAMP obj/third_party/libvpx/libvpx_arm_neon_headers.stamp
+[1026/46109   2% | active=4 | elapsed=593.894s | rate=1.7/s] CC obj/third_party/libsync/libsync/sync.o
+../../third_party/libsync/src/sync.c: In function ‘sync_fence_info’:
+../../third_party/libsync/src/sync.c:135:33: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+  135 |         info->sync_fence_info = (uint64_t) calloc(num_fences,
+      |                                 ^
+../../third_party/libsync/src/sync.c:137:13: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+  137 |         if ((void *)info->sync_fence_info == NULL)
+      |             ^
+../../third_party/libsync/src/sync.c:142:18: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+  142 |             free((void *)info->sync_fence_info);
+      |                  ^
+../../third_party/libsync/src/sync.c:153:18: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+  153 |     fence_info = (struct sync_fence_info *)info->sync_fence_info;
+      |                  ^
+../../third_party/libsync/src/sync.c:164:10: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+  164 |     free((void *)info->sync_fence_info);
+      |          ^
+[1027/46109   2% | active=4 | elapsed=593.897s | rate=1.7/s] STAMP obj/third_party/libsync/libsync.stamp
+[1028/46109   2% | active=4 | elapsed=594.124s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/copymem_neon.o
+[1029/46109   2% | active=4 | elapsed=594.207s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/bilinearpredict_neon.o
+[1030/46109   2% | active=4 | elapsed=594.340s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/dc_only_idct_add_neon.o
+[1031/46109   2% | active=4 | elapsed=594.434s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/dequant_idct_neon.o
+[1032/46109   2% | active=4 | elapsed=594.570s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/dequantizeb_neon.o
+[1033/46109   2% | active=4 | elapsed=594.711s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct_blk_neon.o
+[1034/46109   2% | active=4 | elapsed=594.780s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/iwalsh_neon.o
+[1035/46109   2% | active=4 | elapsed=594.842s | rate=1.7/s] CC obj/third_party/libsrtp/libsrtp/srtp.o
+[1036/46109   2% | active=4 | elapsed=594.859s | rate=1.7/s] AR obj/third_party/libsrtp/libsrtp.a
+[1037/46109   2% | active=4 | elapsed=594.956s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/loopfiltersimplehorizontaledge_neon.o
+[1038/46109   2% | active=4 | elapsed=595.014s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/loopfiltersimpleverticaledge_neon.o
+[1039/46109   2% | active=4 | elapsed=595.185s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/shortidct4x4llm_neon.o
+[1040/46109   2% | active=4 | elapsed=595.208s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/mbloopfilter_neon.o
+[1041/46109   2% | active=4 | elapsed=595.494s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp8_loopfilter_neon.o
+[1042/46109   2% | active=4 | elapsed=595.505s | rate=1.7/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/denoising_neon.o
+[1043/46109   2% | active=4 | elapsed=595.561s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/sixtappredict_neon.o
+[1044/46109   2% | active=4 | elapsed=595.717s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fastquantizeb_neon.o
+[1045/46109   2% | active=4 | elapsed=595.730s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/shortfdct_neon.o
+[1046/46109   2% | active=4 | elapsed=595.783s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp8_shortwalsh4x4_neon.o
+[1047/46109   2% | active=4 | elapsed=596.004s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_iht4x4_add_neon.o
+[1048/46109   2% | active=4 | elapsed=596.136s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_iht8x8_add_neon.o
+[1049/46109   2% | active=4 | elapsed=596.220s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_iht16x16_add_neon.o
+[1050/46109   2% | active=4 | elapsed=596.319s | rate=1.8/s] CXX obj/third_party/harfbuzz-ng/harfbuzz_source/hb-subset.o
+[1051/46109   2% | active=4 | elapsed=596.323s | rate=1.8/s] STAMP obj/third_party/harfbuzz-ng/harfbuzz_source.stamp
+[1052/46109   2% | active=4 | elapsed=596.524s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_diamond_search_sad_neon.o
+[1053/46109   2% | active=4 | elapsed=596.543s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_denoiser_neon.o
+[1054/46109   2% | active=4 | elapsed=596.580s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_error_neon.o
+[1055/46109   2% | active=4 | elapsed=596.872s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_quantize_neon.o
+[1056/46109   2% | active=4 | elapsed=596.875s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/avg_neon.o
+[1057/46109   2% | active=4 | elapsed=597.097s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/avg_pred_neon.o
+[1058/46109   2% | active=4 | elapsed=597.118s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_dct_neon.o
+[1059/46109   2% | active=4 | elapsed=597.287s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/deblock_neon.o
+[1060/46109   2% | active=4 | elapsed=597.363s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vp9_frame_scale_neon.o
+[1061/46109   2% | active=4 | elapsed=597.535s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fdct16x16_neon.o
+[1062/46109   2% | active=4 | elapsed=597.546s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fdct4x4_neon.o
+[1063/46109   2% | active=4 | elapsed=597.664s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fdct8x8_neon.o
+[1064/46109   2% | active=4 | elapsed=597.776s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fdct_partial_neon.o
+[1065/46109   2% | active=4 | elapsed=597.808s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/hadamard_neon.o
+[1066/46109   2% | active=4 | elapsed=597.897s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct16x16_1_add_neon.o
+[1067/46109   2% | active=4 | elapsed=598.136s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct32x32_1_add_neon.o
+[1068/46109   2% | active=4 | elapsed=598.345s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct16x16_add_neon.o
+[1069/46109   2% | active=4 | elapsed=598.474s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct32x32_135_add_neon.o
+[1070/46109   2% | active=4 | elapsed=598.689s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct8x8_1_add_neon.o
+[1071/46109   2% | active=4 | elapsed=598.811s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct32x32_34_add_neon.o
+[1072/46109   2% | active=4 | elapsed=598.986s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct8x8_add_neon.o
+[1073/46109   2% | active=4 | elapsed=599.011s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/idct32x32_add_neon.o
+[1074/46109   2% | active=4 | elapsed=599.257s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/quantize_neon.o
+[1075/46109   2% | active=4 | elapsed=599.554s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/intrapred_neon.o
+[1076/46109   2% | active=4 | elapsed=599.620s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/sad4d_neon.o
+[1077/46109   2% | active=4 | elapsed=599.677s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/fdct32x32_neon.o
+[1078/46109   2% | active=4 | elapsed=599.744s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/sad_neon.o
+[1079/46109   2% | active=4 | elapsed=599.879s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/subtract_neon.o
+[1080/46109   2% | active=4 | elapsed=599.924s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/sum_squares_neon.o
+[1081/46109   2% | active=4 | elapsed=599.937s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vpx_convolve8_neon_asm.o
+[1082/46109   2% | active=4 | elapsed=599.981s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vpx_convolve_neon.o
+[1083/46109   2% | active=4 | elapsed=600.182s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/variance_neon.o
+[1084/46109   2% | active=4 | elapsed=600.351s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/vpx_scaled_convolve8_neon.o
+[1085/46109   2% | active=4 | elapsed=600.816s | rate=1.8/s] CXX obj/third_party/libwebm/libwebm/mkvwriter.o
+[1086/46109   2% | active=4 | elapsed=600.940s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/alpha_dec.o
+[1087/46109   2% | active=4 | elapsed=601.113s | rate=1.8/s] CC obj/third_party/libvpx/libvpx_intrinsics_neon/subpel_variance_neon.o
+[1088/46109   2% | active=4 | elapsed=601.116s | rate=1.8/s] STAMP obj/third_party/libvpx/libvpx_intrinsics_neon.stamp
+[1089/46109   2% | active=4 | elapsed=601.121s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/buffer_dec.o
+[1090/46109   2% | active=4 | elapsed=601.268s | rate=1.8/s] CXX obj/third_party/libwebm/libwebm/mkvmuxerutil.o
+[1091/46109   2% | active=4 | elapsed=601.450s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/io_dec.o
+[1092/46109   2% | active=4 | elapsed=601.487s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/idec_dec.o
+[1093/46109   2% | active=4 | elapsed=601.494s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/frame_dec.o
+[1094/46109   2% | active=4 | elapsed=601.534s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/quant_dec.o
+[1095/46109   2% | active=4 | elapsed=601.814s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/tree_dec.o
+[1096/46109   2% | active=4 | elapsed=601.991s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/vp8_dec.o
+[1097/46109   2% | active=4 | elapsed=602.163s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/webp_dec.o
+[1098/46109   2% | active=4 | elapsed=602.291s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/alpha_processing.o
+[1099/46109   2% | active=4 | elapsed=602.331s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/alpha_processing_mips_dsp_r2.o
+[1100/46109   2% | active=4 | elapsed=602.348s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dec/vp8l_dec.o
+[1101/46109   2% | active=4 | elapsed=602.357s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_demux/demux.o
+[1102/46109   2% | active=4 | elapsed=602.381s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/cost_mips32.o
+[1103/46109   2% | active=4 | elapsed=602.397s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/cost_mips_dsp_r2.o
+[1104/46109   2% | active=4 | elapsed=602.415s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/cpu.o
+[1105/46109   2% | active=4 | elapsed=602.443s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/cost.o
+[1106/46109   2% | active=4 | elapsed=602.462s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/dec_clip_tables.o
+[1107/46109   2% | active=4 | elapsed=602.480s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/dec_mips32.o
+[1108/46109   2% | active=4 | elapsed=602.496s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/dec_mips_dsp_r2.o
+[1109/46109   2% | active=4 | elapsed=602.515s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/dec_msa.o
+[1110/46109   2% | active=4 | elapsed=602.537s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/dec.o
+[1111/46109   2% | active=4 | elapsed=602.551s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/enc_mips32.o
+[1112/46109   2% | active=4 | elapsed=602.573s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/enc_mips_dsp_r2.o
+[1113/46109   2% | active=4 | elapsed=602.589s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/enc_msa.o
+[1114/46109   2% | active=4 | elapsed=602.626s | rate=1.8/s] CC obj/third_party/libwebp/libwebp_dsp/filters_mips_dsp_r2.o
+[1115/46109   2% | active=4 | elapsed=602.645s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/filters.o
+[1116/46109   2% | active=4 | elapsed=602.664s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/filters_msa.o
+[1117/46109   2% | active=4 | elapsed=602.887s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/enc.o
+[1118/46109   2% | active=4 | elapsed=602.947s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_enc_mips32.o
+[1119/46109   2% | active=4 | elapsed=602.984s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_enc_mips_dsp_r2.o
+[1120/46109   2% | active=4 | elapsed=603.020s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_enc_msa.o
+[1121/46109   2% | active=4 | elapsed=603.055s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_mips_dsp_r2.o
+[1122/46109   2% | active=4 | elapsed=603.091s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_msa.o
+[1123/46109   2% | active=4 | elapsed=603.169s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless.o
+[1124/46109   2% | active=4 | elapsed=603.171s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/lossless_enc.o
+[1125/46109   2% | active=4 | elapsed=603.203s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/rescaler_mips32.o
+[1126/46109   2% | active=4 | elapsed=603.204s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/rescaler_mips_dsp_r2.o
+[1127/46109   2% | active=4 | elapsed=603.224s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/rescaler.o
+[1128/46109   2% | active=4 | elapsed=603.238s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/rescaler_msa.o
+[1129/46109   2% | active=4 | elapsed=603.246s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/ssim.o
+[1130/46109   2% | active=4 | elapsed=603.282s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/upsampling_mips_dsp_r2.o
+[1131/46109   2% | active=4 | elapsed=603.283s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/upsampling_msa.o
+[1132/46109   2% | active=4 | elapsed=603.317s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/yuv_mips32.o
+[1133/46109   2% | active=4 | elapsed=603.353s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/upsampling.o
+[1134/46109   2% | active=4 | elapsed=603.355s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/yuv_mips_dsp_r2.o
+[1135/46109   2% | active=4 | elapsed=603.356s | rate=1.9/s] STAMP obj/third_party/libwebp/libwebp_dsp_cpu_c.stamp
+[1136/46109   2% | active=4 | elapsed=603.359s | rate=1.9/s] STAMP obj/third_party/libwebp/libwebp_dsp_headers.stamp
+[1137/46109   2% | active=4 | elapsed=603.642s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/cost_neon.o
+[1138/46109   2% | active=4 | elapsed=603.726s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/alpha_processing_neon.o
+[1139/46109   2% | active=4 | elapsed=603.940s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp/yuv.o
+[1140/46109   2% | active=4 | elapsed=603.960s | rate=1.9/s] CXX obj/third_party/libwebm/libwebm/mkvmuxer.o
+[1141/46109   2% | active=4 | elapsed=603.971s | rate=1.9/s] AR obj/third_party/libwebm/libwebm.a
+[1142/46109   2% | active=4 | elapsed=604.137s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/enc_neon.o
+[1143/46109   2% | active=4 | elapsed=604.244s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/lossless_enc_neon.o
+[1144/46109   2% | active=4 | elapsed=604.273s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/filters_neon.o
+[1145/46109   2% | active=4 | elapsed=604.281s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/rescaler_neon.o
+[1146/46109   2% | active=4 | elapsed=604.401s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/dec_neon.o
+[1147/46109   2% | active=4 | elapsed=604.440s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/alpha_processing_sse2.o
+[1148/46109   2% | active=4 | elapsed=604.476s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/cost_sse2.o
+[1149/46109   2% | active=4 | elapsed=604.514s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/dec_sse2.o
+[1150/46109   2% | active=4 | elapsed=604.550s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/enc_sse2.o
+[1151/46109   2% | active=4 | elapsed=604.586s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/filters_sse2.o
+[1152/46109   2% | active=4 | elapsed=604.618s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/yuv_neon.o
+[1153/46109   2% | active=4 | elapsed=604.621s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/lossless_enc_sse2.o
+[1154/46109   2% | active=4 | elapsed=604.652s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/lossless_sse2.o
+[1155/46109   2% | active=4 | elapsed=604.653s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/rescaler_sse2.o
+[1156/46109   2% | active=4 | elapsed=604.685s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/ssim_sse2.o
+[1157/46109   2% | active=4 | elapsed=604.691s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/upsampling_sse2.o
+[1158/46109   2% | active=4 | elapsed=604.709s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/lossless_neon.o
+[1159/46109   2% | active=4 | elapsed=604.724s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse2/yuv_sse2.o
+[1160/46109   2% | active=4 | elapsed=604.730s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/alpha_processing_sse41.o
+[1161/46109   2% | active=4 | elapsed=604.745s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/dec_sse41.o
+[1162/46109   2% | active=4 | elapsed=604.763s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/enc_sse41.o
+[1163/46109   2% | active=4 | elapsed=604.764s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/lossless_enc_sse41.o
+[1164/46109   2% | active=4 | elapsed=604.780s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/lossless_sse41.o
+[1165/46109   2% | active=4 | elapsed=604.797s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/upsampling_sse41.o
+[1166/46109   2% | active=4 | elapsed=604.800s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_sse41/yuv_sse41.o
+[1167/46109   2% | active=4 | elapsed=604.866s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_dsp_neon/upsampling_neon.o
+[1168/46109   2% | active=4 | elapsed=604.969s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/alpha_enc.o
+[1169/46109   2% | active=4 | elapsed=605.044s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/config_enc.o
+[1170/46109   2% | active=4 | elapsed=605.065s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/analysis_enc.o
+[1171/46109   2% | active=4 | elapsed=605.131s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/filter_enc.o
+[1172/46109   2% | active=4 | elapsed=605.240s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/backward_references_cost_enc.o
+[1173/46109   2% | active=4 | elapsed=605.259s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/cost_enc.o
+[1174/46109   2% | active=4 | elapsed=605.493s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/backward_references_enc.o
+[1175/46109   2% | active=4 | elapsed=605.536s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/iterator_enc.o
+[1176/46109   2% | active=4 | elapsed=605.550s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/near_lossless_enc.o
+[1177/46109   2% | active=4 | elapsed=605.681s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/frame_enc.o
+[1178/46109   2% | active=4 | elapsed=605.706s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/picture_enc.o
+[1179/46109   2% | active=4 | elapsed=605.722s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/picture_psnr_enc.o
+[1180/46109   2% | active=4 | elapsed=605.788s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/picture_rescale_enc.o
+[1181/46109   2% | active=4 | elapsed=605.846s | rate=1.9/s] CC obj/third_party/libwebp/libwebp_enc/histogram_enc.o
+[1182/46109   2% | active=4 | elapsed=605.984s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/picture_tools_enc.o
+[1183/46109   2% | active=4 | elapsed=606.074s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/picture_csp_enc.o
+[1184/46109   2% | active=4 | elapsed=606.152s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/syntax_enc.o
+[1185/46109   2% | active=4 | elapsed=606.210s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/predictor_enc.o
+[1186/46109   2% | active=4 | elapsed=606.279s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/tree_enc.o
+[1187/46109   2% | active=4 | elapsed=606.317s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/token_enc.o
+[1188/46109   2% | active=4 | elapsed=606.453s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/webp_enc.o
+[1189/46109   2% | active=4 | elapsed=606.714s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_mux/muxedit.o
+[1190/46109   2% | active=4 | elapsed=606.770s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/quant_enc.o
+[1191/46109   2% | active=4 | elapsed=606.949s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_mux/anim_encode.o
+[1192/46109   2% | active=4 | elapsed=606.995s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_mux/muxinternal.o
+[1193/46109   2% | active=4 | elapsed=607.026s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_mux/muxread.o
+[1194/46109   2% | active=4 | elapsed=607.033s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv/sharpyuv_cpu.o
+[1195/46109   2% | active=4 | elapsed=607.094s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv/sharpyuv_csp.o
+[1196/46109   2% | active=4 | elapsed=607.111s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv/sharpyuv_gamma.o
+[1197/46109   2% | active=4 | elapsed=607.114s | rate=2.0/s] STAMP obj/third_party/libwebp/libwebp_sharpyuv_dsp_headers.stamp
+[1198/46109   2% | active=4 | elapsed=607.137s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv_dsp/sharpyuv_dsp.o
+[1199/46109   2% | active=4 | elapsed=607.168s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv_sse2/sharpyuv_sse2.o
+[1200/46109   2% | active=4 | elapsed=607.174s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_sharpyuv_sse2.a
+[1201/46109   2% | active=4 | elapsed=607.242s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_enc/vp8l_enc.o
+[1202/46109   2% | active=4 | elapsed=607.302s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/bit_reader_utils.o
+[1203/46109   2% | active=4 | elapsed=607.364s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/color_cache_utils.o
+[1204/46109   2% | active=4 | elapsed=607.398s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv/sharpyuv.o
+[1205/46109   2% | active=4 | elapsed=607.433s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/bit_writer_utils.o
+[1206/46109   2% | active=4 | elapsed=607.462s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/filters_utils.o
+[1207/46109   2% | active=4 | elapsed=607.494s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_sharpyuv_neon/sharpyuv_neon.o
+[1208/46109   2% | active=4 | elapsed=607.501s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_sharpyuv_neon.a
+[1209/46109   2% | active=4 | elapsed=607.618s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/huffman_utils.o
+[1210/46109   2% | active=4 | elapsed=607.621s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/quant_levels_utils.o
+[1211/46109   2% | active=4 | elapsed=607.647s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/quant_levels_dec_utils.o
+[1212/46109   2% | active=4 | elapsed=607.664s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/random_utils.o
+[1213/46109   2% | active=4 | elapsed=607.682s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/huffman_encode_utils.o
+[1214/46109   2% | active=4 | elapsed=607.685s | rate=2.0/s] STAMP obj/third_party/libwebp/libwebp_webp.stamp
+[1215/46109   2% | active=4 | elapsed=607.692s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_sharpyuv_dsp.a
+[1216/46109   2% | active=4 | elapsed=607.702s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_sharpyuv.a
+[1217/46109   2% | active=4 | elapsed=607.715s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/thread_utils.o
+[1218/46109   2% | active=4 | elapsed=607.730s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/rescaler_utils.o
+[1219/46109   2% | active=4 | elapsed=607.786s | rate=2.0/s] CC obj/third_party/libwebp/libwebp_utils/utils.o
+[1220/46109   2% | active=4 | elapsed=607.800s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_utils.a
+[1221/46109   2% | active=4 | elapsed=607.813s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_dec.a
+[1222/46109   2% | active=4 | elapsed=607.821s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_demux.a
+[1223/46109   2% | active=4 | elapsed=607.840s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_enc.a
+[1224/46109   2% | active=4 | elapsed=607.852s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_dsp_sse2.a
+[1225/46109   2% | active=4 | elapsed=607.863s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_dsp_sse41.a
+[1226/46109   2% | active=4 | elapsed=607.885s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_dsp.a
+[1227/46109   2% | active=4 | elapsed=607.898s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_dsp_neon.a
+[1228/46109   2% | active=4 | elapsed=607.908s | rate=2.0/s] AR obj/third_party/libwebp/libwebp_mux.a
+[1229/46109   2% | active=4 | elapsed=607.911s | rate=2.0/s] STAMP obj/third_party/libwebp/libwebp.stamp
+[1230/46109   2% | active=4 | elapsed=608.082s | rate=2.0/s] CC obj/third_party/libxml/libxml/HTMLtree.o
+[1231/46109   2% | active=4 | elapsed=608.194s | rate=2.0/s] CC obj/third_party/libxml/libxml/chvalid.o
+[1232/46109   2% | active=4 | elapsed=608.311s | rate=2.0/s] CC obj/third_party/libxml/libxml/buf.o
+[1233/46109   2% | active=4 | elapsed=608.482s | rate=2.0/s] CC obj/third_party/libxml/libxml/SAX2.o
+[1234/46109   2% | active=4 | elapsed=608.613s | rate=2.0/s] CC obj/third_party/libxml/libxml/dict.o
+[1235/46109   2% | active=4 | elapsed=608.851s | rate=2.0/s] CC obj/third_party/libxml/libxml/entities.o
+[1236/46109   2% | active=4 | elapsed=609.060s | rate=2.0/s] CC obj/third_party/libxml/libxml/error.o
+[1237/46109   2% | active=4 | elapsed=609.123s | rate=2.0/s] CC obj/third_party/libxml/libxml/encoding.o
+[1238/46109   2% | active=4 | elapsed=609.197s | rate=2.0/s] CC obj/third_party/libxml/libxml/globals.o
+[1239/46109   2% | active=4 | elapsed=609.344s | rate=2.0/s] CC obj/third_party/libxml/libxml/list.o
+[1240/46109   2% | active=4 | elapsed=609.480s | rate=2.0/s] CC obj/third_party/libxml/libxml/hash.o
+[1241/46109   2% | active=4 | elapsed=609.537s | rate=2.0/s] CC obj/third_party/libxml/libxml/pattern.o
+[1242/46109   2% | active=4 | elapsed=609.677s | rate=2.0/s] CC obj/third_party/libxml/libxml/threads.o
+[1243/46109   2% | active=4 | elapsed=609.905s | rate=2.0/s] CC obj/third_party/libxml/libxml/HTMLparser.o
+[1244/46109   2% | active=4 | elapsed=610.004s | rate=2.0/s] CC obj/third_party/libxml/libxml/parserInternals.o
+[1245/46109   2% | active=4 | elapsed=610.716s | rate=2.0/s] CC obj/third_party/libxml/libxml/valid.o
+[1246/46109   2% | active=4 | elapsed=610.962s | rate=2.0/s] CC obj/third_party/libxml/libxml/uri.o
+[1247/46109   2% | active=4 | elapsed=611.183s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlmemory.o
+[1248/46109   2% | active=4 | elapsed=611.324s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlIO.o
+[1249/46109   2% | active=4 | elapsed=612.150s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlsave.o
+[1250/46109   2% | active=4 | elapsed=612.212s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlreader.o
+[1251/46109   2% | active=4 | elapsed=612.238s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlunicode.o
+[1252/46109   2% | active=4 | elapsed=612.535s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlstring.o
+[1253/46109   2% | active=4 | elapsed=612.670s | rate=2.0/s] CC obj/third_party/libxml/libxml/tree.o
+[1254/46109   2% | active=4 | elapsed=612.700s | rate=2.0/s] CXX obj/third_party/libxml/libxml/disabled_libxml_features.o
+[1255/46109   2% | active=4 | elapsed=613.226s | rate=2.0/s] CC obj/third_party/libxml/libxml/xmlwriter.o
+[1256/46109   2% | active=4 | elapsed=613.338s | rate=2.0/s] CXX obj/third_party/libxml/libxml_utils/libxml_utils.o
+[1257/46109   2% | active=4 | elapsed=613.921s | rate=2.0/s] CC obj/third_party/libxml/libxml/parser.o
+[1258/46109   2% | active=4 | elapsed=613.984s | rate=2.0/s] CXX obj/third_party/libxml/xml_writer/xml_writer.o
+[1259/46109   2% | active=4 | elapsed=614.179s | rate=2.0/s] CC obj/third_party/libxslt/libxslt/attrvt.o
+[1260/46109   2% | active=4 | elapsed=614.229s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/attributes.o
+[1261/46109   2% | active=4 | elapsed=614.326s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/documents.o
+[1262/46109   2% | active=4 | elapsed=614.450s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/extra.o
+[1263/46109   2% | active=4 | elapsed=614.505s | rate=2.1/s] CXX obj/third_party/libxml/xml_reader/xml_reader.o
+[1264/46109   2% | active=4 | elapsed=614.674s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/extensions.o
+[1265/46109   2% | active=4 | elapsed=614.683s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/imports.o
+[1266/46109   2% | active=4 | elapsed=614.792s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/functions.o
+[1267/46109   2% | active=4 | elapsed=614.853s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/namespaces.o
+[1268/46109   2% | active=4 | elapsed=614.952s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/keys.o
+[1269/46109   2% | active=4 | elapsed=615.329s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/numbers.o
+[1270/46109   2% | active=4 | elapsed=615.393s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/preproc.o
+[1271/46109   2% | active=4 | elapsed=615.463s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/security.o
+[1272/46109   2% | active=4 | elapsed=615.646s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/templates.o
+[1273/46109   2% | active=4 | elapsed=615.789s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/pattern.o
+[1274/46109   2% | active=4 | elapsed=616.119s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/variables.o
+[1275/46109   2% | active=4 | elapsed=616.182s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/xsltlocale.o
+[1276/46109   2% | active=4 | elapsed=616.631s | rate=2.1/s] CC obj/third_party/libxml/libxml/xpath.o
+[1277/46109   2% | active=4 | elapsed=616.641s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/xslt.o
+[1278/46109   2% | active=4 | elapsed=616.714s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/compare_common.o
+[1279/46109   2% | active=4 | elapsed=616.798s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/transform.o
+[1280/46109   2% | active=4 | elapsed=616.805s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/compare_gcc.o
+[1281/46109   2% | active=4 | elapsed=616.889s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/compare_win.o
+[1282/46109   2% | active=4 | elapsed=617.052s | rate=2.1/s] CC obj/third_party/libxslt/libxslt/xsltutils.o
+[1283/46109   2% | active=4 | elapsed=617.234s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/compare.o
+[1284/46109   2% | active=4 | elapsed=617.460s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_from.o
+[1285/46109   2% | active=4 | elapsed=617.758s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_jpeg.o
+[1286/46109   2% | active=4 | elapsed=617.825s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert.o
+[1287/46109   2% | active=4 | elapsed=618.032s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_from_argb.o
+[1288/46109   2% | active=4 | elapsed=618.040s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_to_i420.o
+[1289/46109   2% | active=4 | elapsed=618.042s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_to_argb.o
+[1290/46109   2% | active=4 | elapsed=618.108s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/mjpeg_validate.o
+[1291/46109   2% | active=4 | elapsed=618.158s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/cpu_id.o
+[1292/46109   2% | active=4 | elapsed=618.423s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/mjpeg_decoder.o
+[1293/46109   2% | active=4 | elapsed=618.473s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate_any.o
+[1294/46109   2% | active=4 | elapsed=618.625s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate.o
+[1295/46109   2% | active=4 | elapsed=618.631s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate_argb.o
+[1296/46109   2% | active=4 | elapsed=618.709s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate_gcc.o
+[1297/46109   2% | active=4 | elapsed=618.796s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate_win.o
+[1298/46109   2% | active=4 | elapsed=618.857s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/rotate_common.o
+[1299/46109   2% | active=4 | elapsed=618.950s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/convert_argb.o
+[1300/46109   2% | active=4 | elapsed=619.050s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/row_gcc.o
+[1301/46109   2% | active=4 | elapsed=619.140s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/row_rvv.o
+[1302/46109   2% | active=4 | elapsed=619.226s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/row_win.o
+[1303/46109   2% | active=4 | elapsed=619.887s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/planar_functions.o
+[1304/46109   2% | active=4 | elapsed=620.173s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/row_any.o
+[1305/46109   2% | active=4 | elapsed=620.175s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale.o
+[1306/46109   2% | active=4 | elapsed=620.295s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_any.o
+[1307/46109   2% | active=4 | elapsed=620.390s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_gcc.o
+[1308/46109   2% | active=4 | elapsed=620.501s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_argb.o
+[1309/46109   2% | active=4 | elapsed=620.512s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_rgb.o
+[1310/46109   2% | active=4 | elapsed=620.600s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_rvv.o
+[1311/46109   2% | active=4 | elapsed=620.695s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_win.o
+[1312/46109   2% | active=4 | elapsed=620.744s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/video_common.o
+[1313/46109   2% | active=4 | elapsed=620.837s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/compare_neon.o
+[1314/46109   2% | active=4 | elapsed=620.919s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_uv.o
+[1315/46109   2% | active=4 | elapsed=620.920s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/compare_neon64.o
+[1316/46109   2% | active=4 | elapsed=621.006s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/rotate_neon64.o
+[1317/46109   2% | active=4 | elapsed=621.022s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/rotate_neon.o
+[1318/46109   2% | active=4 | elapsed=621.111s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/row_neon64.o
+[1319/46109   2% | active=4 | elapsed=621.293s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/scale_neon.o
+[1320/46109   2% | active=4 | elapsed=621.387s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/scale_neon64.o
+[1321/46109   2% | active=4 | elapsed=621.440s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_neon/row_neon.o
+[1322/46109   2% | active=4 | elapsed=621.450s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_add.o
+[1323/46109   2% | active=4 | elapsed=621.496s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_add_dir.o
+[1324/46109   2% | active=4 | elapsed=621.518s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_add_entry.o
+[1325/46109   2% | active=4 | elapsed=621.608s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_algorithm_deflate.o
+[1326/46109   2% | active=4 | elapsed=621.694s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/scale_common.o
+[1327/46109   2% | active=4 | elapsed=621.704s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_buffer.o
+[1328/46109   2% | active=4 | elapsed=621.761s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_delete.o
+[1329/46109   2% | active=4 | elapsed=621.783s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_dir_add.o
+[1330/46109   2% | active=4 | elapsed=621.855s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_discard.o
+[1331/46109   2% | active=4 | elapsed=621.915s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_entry.o
+[1332/46109   2% | active=4 | elapsed=621.934s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_close.o
+[1333/46109   2% | active=4 | elapsed=621.995s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_error_clear.o
+[1334/46109   2% | active=4 | elapsed=622.015s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_error.o
+[1335/46109   2% | active=4 | elapsed=622.055s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_error_get.o
+[1336/46109   2% | active=4 | elapsed=622.081s | rate=2.1/s] CC obj/third_party/libzip/libzip/zip_error_get_sys_type.o
+[1337/46109   2% | active=4 | elapsed=622.140s | rate=2.1/s] CXX obj/third_party/libyuv/libyuv_internal/row_common.o
+[1338/46109   2% | active=4 | elapsed=622.141s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_error_strerror.o
+[1339/46109   2% | active=4 | elapsed=622.153s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_error_to_str.o
+[1340/46109   2% | active=4 | elapsed=622.166s | rate=2.2/s] AR obj/third_party/libyuv/libyuv_internal.a
+[1341/46109   2% | active=4 | elapsed=622.178s | rate=2.2/s] AR obj/third_party/libyuv/libyuv_neon.a
+[1342/46109   2% | active=4 | elapsed=622.222s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_dirent.o
+[1343/46109   2% | active=4 | elapsed=622.250s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fclose.o
+[1344/46109   2% | active=4 | elapsed=622.297s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fdopen.o
+[1345/46109   2% | active=4 | elapsed=622.311s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_add.o
+[1346/46109   2% | active=4 | elapsed=622.336s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_extra_field_api.o
+[1347/46109   2% | active=4 | elapsed=622.347s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_extra_field.o
+[1348/46109   2% | active=4 | elapsed=622.354s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_error_clear.o
+[1349/46109   2% | active=4 | elapsed=622.370s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_error_get.o
+[1350/46109   2% | active=4 | elapsed=622.399s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_get_comment.o
+[1351/46109   2% | active=4 | elapsed=622.405s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_get_external_attributes.o
+[1352/46109   2% | active=4 | elapsed=622.425s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_get_offset.o
+[1353/46109   2% | active=4 | elapsed=622.443s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_rename.o
+[1354/46109   2% | active=4 | elapsed=622.483s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_set_comment.o
+[1355/46109   2% | active=4 | elapsed=622.487s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_replace.o
+[1356/46109   2% | active=4 | elapsed=622.512s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_set_external_attributes.o
+[1357/46109   2% | active=4 | elapsed=622.517s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_set_encryption.o
+[1358/46109   2% | active=4 | elapsed=622.544s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_strerror.o
+[1359/46109   2% | active=4 | elapsed=622.551s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_file_set_mtime.o
+[1360/46109   2% | active=4 | elapsed=622.569s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fopen_encrypted.o
+[1361/46109   2% | active=4 | elapsed=622.570s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fopen.o
+[1362/46109   2% | active=4 | elapsed=622.606s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fopen_index.o
+[1363/46109   2% | active=4 | elapsed=622.618s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fopen_index_encrypted.o
+[1364/46109   2% | active=4 | elapsed=622.629s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fread.o
+[1365/46109   2% | active=4 | elapsed=622.630s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_fseek.o
+[1366/46109   2% | active=4 | elapsed=622.664s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_ftell.o
+[1367/46109   2% | active=4 | elapsed=622.676s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_archive_comment.o
+[1368/46109   2% | active=4 | elapsed=622.687s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_archive_flag.o
+[1369/46109   2% | active=4 | elapsed=622.694s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_encryption_implementation.o
+[1370/46109   2% | active=4 | elapsed=622.724s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_file_comment.o
+[1371/46109   2% | active=4 | elapsed=622.740s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_name.o
+[1372/46109   2% | active=4 | elapsed=622.752s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_num_entries.o
+[1373/46109   2% | active=4 | elapsed=622.754s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_get_num_files.o
+[1374/46109   2% | active=4 | elapsed=622.808s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_libzip_version.o
+[1375/46109   2% | active=4 | elapsed=622.813s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_memdup.o
+[1376/46109   2% | active=4 | elapsed=622.831s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_io_util.o
+[1377/46109   2% | active=4 | elapsed=622.889s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_mkstempm.o
+[1378/46109   2% | active=4 | elapsed=622.891s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_name_locate.o
+[1379/46109   2% | active=4 | elapsed=622.898s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_new.o
+[1380/46109   2% | active=4 | elapsed=622.906s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_hash.o
+[1381/46109   2% | active=4 | elapsed=622.978s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_random_unix.o
+[1382/46109   2% | active=4 | elapsed=622.987s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_pkware.o
+[1383/46109   2% | active=4 | elapsed=623.028s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_progress.o
+[1384/46109   3% | active=4 | elapsed=623.036s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_rename.o
+[1385/46109   3% | active=4 | elapsed=623.040s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_replace.o
+[1386/46109   3% | active=4 | elapsed=623.097s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_archive_comment.o
+[1387/46109   3% | active=4 | elapsed=623.104s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_archive_flag.o
+[1388/46109   3% | active=4 | elapsed=623.105s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_default_password.o
+[1389/46109   3% | active=4 | elapsed=623.154s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_file_comment.o
+[1390/46109   3% | active=4 | elapsed=623.174s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_file_compression.o
+[1391/46109   3% | active=4 | elapsed=623.196s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_set_name.o
+[1392/46109   3% | active=4 | elapsed=623.217s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_accept_empty.o
+[1393/46109   3% | active=4 | elapsed=623.236s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_begin_write.o
+[1394/46109   3% | active=4 | elapsed=623.249s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_open.o
+[1395/46109   3% | active=4 | elapsed=623.253s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_begin_write_cloning.o
+[1396/46109   3% | active=4 | elapsed=623.304s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_call.o
+[1397/46109   3% | active=4 | elapsed=623.310s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_close.o
+[1398/46109   3% | active=4 | elapsed=623.315s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_commit_write.o
+[1399/46109   3% | active=4 | elapsed=623.375s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_error.o
+[1400/46109   3% | active=4 | elapsed=623.423s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_crc.o
+[1401/46109   3% | active=4 | elapsed=623.447s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_compress.o
+[1402/46109   3% | active=4 | elapsed=623.495s | rate=2.2/s] CC obj/third_party/libzip/libzip/zip_source_buffer.o
+[1403/46109   3% | active=4 | elapsed=623.530s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_file_common.o
+[1404/46109   3% | active=4 | elapsed=623.533s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_file_stdio.o
+[1405/46109   3% | active=4 | elapsed=623.562s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_free.o
+[1406/46109   3% | active=4 | elapsed=623.567s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_file_stdio_named.o
+[1407/46109   3% | active=4 | elapsed=623.605s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_function.o
+[1408/46109   3% | active=4 | elapsed=623.617s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_get_file_attributes.o
+[1409/46109   3% | active=4 | elapsed=623.622s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_is_deleted.o
+[1410/46109   3% | active=4 | elapsed=623.626s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_layered.o
+[1411/46109   3% | active=4 | elapsed=623.671s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_open.o
+[1412/46109   3% | active=4 | elapsed=623.699s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_read.o
+[1413/46109   3% | active=4 | elapsed=623.717s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_pkware_decode.o
+[1414/46109   3% | active=4 | elapsed=623.729s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_pkware_encode.o
+[1415/46109   3% | active=4 | elapsed=623.731s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_remove.o
+[1416/46109   3% | active=4 | elapsed=623.756s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_rollback_write.o
+[1417/46109   3% | active=4 | elapsed=623.785s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_seek_write.o
+[1418/46109   3% | active=4 | elapsed=623.788s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_stat.o
+[1419/46109   3% | active=4 | elapsed=623.789s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_seek.o
+[1420/46109   3% | active=4 | elapsed=623.819s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_supports.o
+[1421/46109   3% | active=4 | elapsed=623.844s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_tell.o
+[1422/46109   3% | active=4 | elapsed=623.847s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_tell_write.o
+[1423/46109   3% | active=4 | elapsed=623.879s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_write.o
+[1424/46109   3% | active=4 | elapsed=623.910s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_zip.o
+[1425/46109   3% | active=4 | elapsed=623.930s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_window.o
+[1426/46109   3% | active=4 | elapsed=623.936s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_stat.o
+[1427/46109   3% | active=4 | elapsed=623.968s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_source_zip_new.o
+[1428/46109   3% | active=4 | elapsed=623.979s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_stat_index.o
+[1429/46109   3% | active=4 | elapsed=623.996s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_strerror.o
+[1430/46109   3% | active=4 | elapsed=624.000s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_stat_init.o
+[1431/46109   3% | active=4 | elapsed=624.056s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_unchange.o
+[1432/46109   3% | active=4 | elapsed=624.059s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_unchange_all.o
+[1433/46109   3% | active=4 | elapsed=624.060s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_unchange_archive.o
+[1434/46109   3% | active=4 | elapsed=624.078s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_string.o
+[1435/46109   3% | active=4 | elapsed=624.081s | rate=2.3/s] STAMP obj/third_party/libzip/libzip_public_headers.stamp
+[1436/46109   3% | active=4 | elapsed=624.108s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_err_str.o
+[1437/46109   3% | active=4 | elapsed=624.115s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_unchange_data.o
+[1438/46109   3% | active=4 | elapsed=624.136s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zAlloc.o
+[1439/46109   3% | active=4 | elapsed=624.161s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zBuf.o
+[1440/46109   3% | active=4 | elapsed=624.172s | rate=2.3/s] CC obj/third_party/libzip/libzip/zip_utf-8.o
+[1441/46109   3% | active=4 | elapsed=624.198s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zCrc.o
+[1442/46109   3% | active=4 | elapsed=624.240s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zCrcOpt.o
+[1443/46109   3% | active=4 | elapsed=624.314s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zFile.o
+[1444/46109   3% | active=4 | elapsed=624.364s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zStream.o
+[1445/46109   3% | active=4 | elapsed=624.381s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zDec.o
+[1446/46109   3% | active=4 | elapsed=624.393s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Alloc.o
+[1447/46109   3% | active=4 | elapsed=624.458s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bra86.o
+[1448/46109   3% | active=4 | elapsed=624.471s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bcj2.o
+[1449/46109   3% | active=4 | elapsed=624.483s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Bra.o
+[1450/46109   3% | active=4 | elapsed=624.506s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o
+FAILED: obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o 
+../../../../../../../../opt/lgwos-sdk/arm-webos-linux-gnueabi_sdk-buildroot/bin/arm-webos-linux-gnueabi-gcc -MMD -MF obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o.d -DENABLE_BROWSER_CONTROL_WEBAPI=1 -DENABLE_SAMPLE_WEBAPI=1 -DENABLE_MEMORYMANAGER_WEBAPI=1 -DENABLE_NETWORK_ERROR_PAGE_CONTROLLER_WEBAPI=1 -DENABLE_PWA_MANAGER_WEBAPI=1 -DENABLE_WEBOS_SERVICE_BRIDGE_WEBAPI=1 -DENABLE_WEBOS_SYSTEM_WEBAPI=1 -DNEVA_DCHECK_ALWAYS_ON=1 -DOS_WEBOS=1 -DNEVA_VIDEO_HOLE=1 -DUSE_NEVA_APPRUNTIME=1 -DUSE_NEVA_MEDIA=1 -DUSE_NEVA_BROWSER_SERVICE=1 -DUSE_WEBRISK_SERVICE=1 -DENABLE_PINCH_TO_ZOOM=1 -DUSE_WEBRISK_DATABASE=1 -DUSE_NEVA_PUNCH_HOLE=1 -DUSE_NEVA_CDM=1 -DENABLE_WEBM_AUDIO_CODECS=1 -DENABLE_WEBM_VIDEO_CODECS=1 -DUSE_NEVA_SUSPEND_MEDIA_CAPTURE=1 -DUSE_FILESCHEME_CODECACHE=1 -DUSE_SINGLE_WINDOW_MODE=1 -DUSE_NEVA_CHROME_EXTENSIONS=1 -DWEBOS_SUBMISSION_NUMBER=0 -DUSE_UDEV -DUSE_AURA=1 -DUSE_GLIB=1 -DUSE_OZONE=1 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -DCR_SYSROOT_KEY=20230611T210420Z-2 -DNDEBUG -DNVALGRIND -DDYNAMIC_ANNOTATIONS_ENABLED=0 -D_7ZIP_ST -D_7Z_NO_METHODS_FILTERS -D_LZMA_PROB32 -I../.. -Igen -I../../third_party/lzma_sdk -I../../third_party/lzma_sdk/C -Wno-unused-variable -fno-ident -fno-strict-aliasing -fstack-protector -funwind-tables -fPIC -pipe -pthread -Wno-builtin-macro-redefined -D__DATE__= -D__TIME__= -D__TIMESTAMP__= -mfpu=neon -mthumb -O2 -fdata-sections -ffunction-sections -fno-math-errno -fno-omit-frame-pointer -g0 -fvisibility=hidden -Wno-psabi -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-deprecated-declarations -Wno-comments -Wno-packed-not-aligned -Wno-attributes -Wno-missing-field-initializers -Wno-unused-parameter -Wno-psabi -std=gnu11 --sysroot=../../../../../../../../opt/lgwos-sdk/arm-webos-linux-gnueabi_sdk-buildroot/arm-webos-linux-gnueabi/sysroot -c ../../third_party/lzma_sdk/C/CpuArch.c -o obj/third_party/lzma_sdk/lzma_sdk/CpuArch.o
+../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_CRC32’:
+../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                          ^~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:438:58: note: each undeclared identifier is reported only once for each function it appears in
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                          ^~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_CRC32’ undeclared (first use in this function)
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                                        ^~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:450:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  450 | MY_HWCAP_CHECK_FUNC (CRC32)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_SHA1’:
+../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                          ^~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:451:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  451 | MY_HWCAP_CHECK_FUNC (SHA1)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_SHA1’ undeclared (first use in this function); did you mean ‘HWCAP_FPA’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                                        ^~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:451:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  451 | MY_HWCAP_CHECK_FUNC (SHA1)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_SHA2’:
+../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                          ^~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:452:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  452 | MY_HWCAP_CHECK_FUNC (SHA2)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_SHA2’ undeclared (first use in this function); did you mean ‘HWCAP_FPA’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                                        ^~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:452:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  452 | MY_HWCAP_CHECK_FUNC (SHA2)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c: In function ‘CPU_IsSupported_AES’:
+../../third_party/lzma_sdk/C/CpuArch.c:438:58: error: ‘AT_HWCAP2’ undeclared (first use in this function); did you mean ‘AT_HWCAP’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                          ^~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:453:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  453 | MY_HWCAP_CHECK_FUNC (AES)
+      | ^~~~~~~~~~~~~~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:438:72: error: ‘HWCAP2_AES’ undeclared (first use in this function); did you mean ‘HWCAP_TLS’?
+  438 |   BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
+      |                                                                        ^~~~~~~
+../../third_party/lzma_sdk/C/CpuArch.c:453:1: note: in expansion of macro ‘MY_HWCAP_CHECK_FUNC’
+  453 | MY_HWCAP_CHECK_FUNC (AES)
+      | ^~~~~~~~~~~~~~~~~~~
+[1451/46109   3% | active=3 | elapsed=624.507s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/DllSecur.o
+[1452/46109   3% | active=2 | elapsed=624.542s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/Delta.o
+[1453/46109   3% | active=1 | elapsed=624.756s | rate=2.3/s] CC obj/third_party/lzma_sdk/lzma_sdk/7zArcIn.o
+ninja: build stopped: subcommand failed.
+WEBOSWEBRUNTIME_BUILD_RC=1
+
