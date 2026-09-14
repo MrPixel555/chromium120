@@ -51,3 +51,19 @@ diff --git a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc b/src/
 +
  #include <algorithm>
  #include <limits>
+
+diff --git a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc b/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
+--- a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
++++ b/src/third_party/crashpad/crashpad/util/linux/ptracer.cc
+@@ -17,6 +17,10 @@
+ #include <errno.h>
+ #include <linux/elf.h>
+ #include <string.h>
+ #include <sys/ptrace.h>
+ #include <sys/uio.h>
+ 
++#ifndef PTRACE_GETREGSET
++#define PTRACE_GETREGSET 0x4204
++#endif
++
+ #include "base/check_op.h"
