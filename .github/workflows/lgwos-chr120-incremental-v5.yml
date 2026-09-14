@@ -176,7 +176,7 @@ jobs:
           test "$(/usr/bin/pkg-config --modversion libdrm)" = "2.4.124"
           echo 'SYSDEPS_READY=1' | tee -a "$LOG"
 
-      - name: Patch source compatibility gates, Neva locale dependency, and legacy ARM auxv
+      - name: Patch source compatibility gates, Neva locale dependency, and legacy ARM APIs
         shell: bash
         run: |
           set -euxo pipefail
@@ -222,12 +222,21 @@ jobs:
           if s.count(old) != 1:
               raise SystemExit(f'unexpected sys/auxv.h anchor count: {s.count(old)}')
           boringssl.write_text(s.replace(old, new, 1))
+
+          randposix = Path('base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc')
+          s = randposix.read_text()
+          old = '#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)\n'
+          new = '#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(__NR_getrandom)\n'
+          if s.count(old) != 1:
+              raise SystemExit(f'unexpected getrandom platform guard count: {s.count(old)}')
+          randposix.write_text(s.replace(old, new, 1))
           PY
           git diff --check
           git diff -- \
             media/gpu/sandbox/BUILD.gn \
             neva/app_runtime/BUILD.gn \
             third_party/boringssl/src/crypto/cpu_arm_linux.c \
+            base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc \
             | tee "$GITHUB_WORKSPACE/lgwos-logs/source-gates.patch"
 
       - name: Audit host NSS and host target GLib through Chromium wrapper
