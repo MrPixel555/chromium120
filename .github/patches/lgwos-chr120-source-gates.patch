@@ -1,0 +1,124 @@
+diff --git a/src/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc b/src/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc
+index 20d4c66cc5..d3d7be933c 100644
+--- a/src/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc
++++ b/src/base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc
+@@ -67,7 +67,7 @@ namespace partition_alloc::internal::base {
+ // (https://chromium-review.googlesource.com/c/chromium/src/+/1545096) and land
+ // it or some form of it.
+ void RandBytes(void* output, size_t output_length) {
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
++#if (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)) && defined(__NR_getrandom)
+   // Use `syscall(__NR_getrandom...` to avoid a dependency on
+   // `third_party/linux_syscall_support.h`.
+   //
+diff --git a/src/media/gpu/sandbox/BUILD.gn b/src/media/gpu/sandbox/BUILD.gn
+index cfcb7fa80e..0afd45e5d1 100644
+--- a/src/media/gpu/sandbox/BUILD.gn
++++ b/src/media/gpu/sandbox/BUILD.gn
+@@ -31,7 +31,7 @@ source_set("sandbox") {
+     deps += [ "//media/gpu/v4l2" ]
+   }
+   if (current_cpu != "s390x" && current_cpu != "ppc64" && is_linux &&
+-      !is_castos) {
++      !is_castos && use_vaapi) {
+     # For DRI_DRIVER_DIR.
+     configs += [ "//build/config/linux/dri" ]
+   }
+diff --git a/src/neva/app_runtime/BUILD.gn b/src/neva/app_runtime/BUILD.gn
+index 8c686e1723..a06fad87b6 100644
+--- a/src/neva/app_runtime/BUILD.gn
++++ b/src/neva/app_runtime/BUILD.gn
+@@ -471,7 +471,10 @@ repack_locales("repack_extra") {
+ if (!use_cbe) {
+   repack_locales("locales_repack") {
+     source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
+-    deps = [ ":app_runtime_network_error_strings" ]
++    deps = [
++      ":app_runtime_network_error_strings",
++      ":repack",
++    ]
+ 
+     output_dir = "$root_out_dir/neva_locales"
+     input_locales = app_runtime_locales
+diff --git a/src/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc b/src/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+index ba995ace6d..9f1bb63472 100644
+--- a/src/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
++++ b/src/sandbox/linux/seccomp-bpf-helpers/syscall_parameters_restrictions.cc
+@@ -21,6 +21,36 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++// LGWOS: the legacy ARMv7 webOS SDK exposes older libc/kernel UAPI
++// headers. Keep Chromium's sandbox policy intact while supplying the
++// stable Linux ABI constants missing from those headers.
++#ifndef F_ADD_SEALS
++#define F_ADD_SEALS 1033
++#endif
++#ifndef F_GET_SEALS
++#define F_GET_SEALS 1034
++#endif
++#ifndef F_SEAL_SEAL
++#define F_SEAL_SEAL 0x0001
++#endif
++#ifndef F_SEAL_SHRINK
++#define F_SEAL_SHRINK 0x0002
++#endif
++#ifndef F_SEAL_GROW
++#define F_SEAL_GROW 0x0004
++#endif
++#ifndef PTRACE_GETREGSET
++#define PTRACE_GETREGSET 0x4204
++#endif
++#if defined(__arm__)
++#ifndef PTRACE_GET_THREAD_AREA
++#define PTRACE_GET_THREAD_AREA 22
++#endif
++#ifndef PTRACE_GETVFPREGS
++#define PTRACE_GETVFPREGS 27
++#endif
++#endif
++
+ #include "base/notreached.h"
+ #include "base/synchronization/synchronization_buildflags.h"
+ #include "build/build_config.h"
+diff --git a/src/third_party/boringssl/src/crypto/cpu_arm_linux.c b/src/third_party/boringssl/src/crypto/cpu_arm_linux.c
+index e3a237083d..e0640d4f50 100644
+--- a/src/third_party/boringssl/src/crypto/cpu_arm_linux.c
++++ b/src/third_party/boringssl/src/crypto/cpu_arm_linux.c
+@@ -19,6 +19,10 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <sys/auxv.h>
++
++#ifndef AT_HWCAP2
++#define AT_HWCAP2 26
++#endif
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
+diff --git a/src/third_party/skia/modules/skcms/src/Transform_inl.h b/src/third_party/skia/modules/skcms/src/Transform_inl.h
+index 6f64b083b4..4e09de60aa 100644
+--- a/src/third_party/skia/modules/skcms/src/Transform_inl.h
++++ b/src/third_party/skia/modules/skcms/src/Transform_inl.h
+@@ -61,7 +61,7 @@ using U8  = V<uint8_t>;
+     #elif defined(__GNUC__)
+         // GCC's arm_neon.h guards them with the FP16 format macros (IEEE and ALTERNATIVE).
+         // We don't actually want the alternative format - we're reading/writing IEEE f16 values.
+-        #if defined(__ARM_FP16_FORMAT_IEEE)
++        #if defined(__ARM_FP16_FORMAT_IEEE) && defined(__ARM_FP) && (__ARM_FP & 2)
+             #define USING_NEON_F16C
+         #endif
+     #endif
+diff --git a/src/third_party/zlib/cpu_features.c b/src/third_party/zlib/cpu_features.c
+index 64e0428cd2..b229a73a26 100644
+--- a/src/third_party/zlib/cpu_features.c
++++ b/src/third_party/zlib/cpu_features.c
+@@ -110,7 +110,7 @@ static void _cpu_check_features(void)
+     unsigned long features = getauxval(AT_HWCAP);
+     arm_cpu_enable_crc32 = !!(features & HWCAP_CRC32);
+     arm_cpu_enable_pmull = !!(features & HWCAP_PMULL);
+-#elif defined(ARMV8_OS_LINUX) && (defined(__ARM_NEON) || defined(__ARM_NEON__))
++#elif defined(ARMV8_OS_LINUX) && (defined(__ARM_NEON) || defined(__ARM_NEON__)) && defined(__ARM_ARCH) && (__ARM_ARCH >= 8)
+     /* Query HWCAP2 for ARMV8-A SoCs running in aarch32 mode */
+     unsigned long features = getauxval(AT_HWCAP2);
+     arm_cpu_enable_crc32 = !!(features & HWCAP2_CRC32);
