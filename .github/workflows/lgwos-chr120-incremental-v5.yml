@@ -176,7 +176,7 @@ jobs:
           test "$(/usr/bin/pkg-config --modversion libdrm)" = "2.4.124"
           echo 'SYSDEPS_READY=1' | tee -a "$LOG"
 
-      - name: Patch source compatibility gates and Neva locale dependency
+      - name: Patch source compatibility gates, Neva locale dependency, and legacy ARM auxv
         shell: bash
         run: |
           set -euxo pipefail
@@ -208,9 +208,26 @@ jobs:
           if s.count(old) != 1:
               raise SystemExit(f'unexpected locales_repack anchor count: {s.count(old)}')
           app.write_text(s.replace(old, new, 1))
+
+          boringssl = Path('third_party/boringssl/src/crypto/cpu_arm_linux.c')
+          s = boringssl.read_text()
+          old = '#include <sys/auxv.h>\n'
+          new = '''#include <sys/auxv.h>
+
+          #ifndef AT_HWCAP2
+          #define AT_HWCAP2 26
+          #endif
+          '''
+          new = '\n'.join(line[10:] if line.startswith('          ') else line for line in new.splitlines()) + '\n'
+          if s.count(old) != 1:
+              raise SystemExit(f'unexpected sys/auxv.h anchor count: {s.count(old)}')
+          boringssl.write_text(s.replace(old, new, 1))
           PY
           git diff --check
-          git diff -- media/gpu/sandbox/BUILD.gn neva/app_runtime/BUILD.gn \
+          git diff -- \
+            media/gpu/sandbox/BUILD.gn \
+            neva/app_runtime/BUILD.gn \
+            third_party/boringssl/src/crypto/cpu_arm_linux.c \
             | tee "$GITHUB_WORKSPACE/lgwos-logs/source-gates.patch"
 
       - name: Audit host NSS and host target GLib through Chromium wrapper
