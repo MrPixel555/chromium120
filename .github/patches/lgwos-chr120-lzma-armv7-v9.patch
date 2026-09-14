@@ -35,3 +35,19 @@ index 0b559ec..827b707 100644
  #include "util/misc/no_cfi_icall.h"
  
  #if defined(__GLIBC__)
+
+diff --git a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc b/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
+--- a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
++++ b/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
+@@ -19,6 +19,12 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ 
++#ifndef O_TMPFILE
++// LGWOS: the legacy webOS userspace headers predate Linux 3.11. Preserve
++// Crashpad's runtime fallback by supplying the stable Linux open(2) flag.
++#define O_TMPFILE (020000000 | O_DIRECTORY)
++#endif
++
+ #include <algorithm>
+ #include <limits>
