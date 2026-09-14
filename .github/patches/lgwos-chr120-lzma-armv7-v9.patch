@@ -17,3 +17,21 @@ diff --git a/src/third_party/lzma_sdk/C/CpuArch.c b/src/third_party/lzma_sdk/C/C
 +    BoolInt CPU_IsSupported_ ## name() { return 0; }
 +  #endif
    MY_HWCAP_CHECK_FUNC_2(NEON, NEON)
+
+diff --git a/src/third_party/crashpad/crashpad/compat/linux/sys/mman_memfd_create.cc b/src/third_party/crashpad/crashpad/compat/linux/sys/mman_memfd_create.cc
+index 0b559ec..827b707 100644
+--- a/src/third_party/crashpad/crashpad/compat/linux/sys/mman_memfd_create.cc
++++ b/src/third_party/crashpad/crashpad/compat/linux/sys/mman_memfd_create.cc
+@@ -18,6 +18,12 @@
+ #include <sys/syscall.h>
+ #include <unistd.h>
+ 
++#if defined(__arm__) && !defined(SYS_memfd_create)
++// LGWOS: old webOS ARM userspace headers predate memfd_create. Linux ARM EABI
++// reserves syscall 385 for memfd_create; unsupported old kernels return ENOSYS.
++#define SYS_memfd_create 385
++#endif
++
+ #include "util/misc/no_cfi_icall.h"
+ 
+ #if defined(__GLIBC__)
