@@ -223,6 +223,14 @@ jobs:
               raise SystemExit(f'unexpected sys/auxv.h anchor count: {s.count(old)}')
           boringssl.write_text(s.replace(old, new, 1))
 
+          zlib_cpu = Path('third_party/zlib/cpu_features.c')
+          s = zlib_cpu.read_text()
+          old = '#elif defined(ARMV8_OS_LINUX) && (defined(__ARM_NEON) || defined(__ARM_NEON__))\n'
+          new = '#elif defined(ARMV8_OS_LINUX) && (defined(__ARM_NEON) || defined(__ARM_NEON__)) && defined(__ARM_ARCH) && (__ARM_ARCH >= 8)\n'
+          if s.count(old) != 1:
+              raise SystemExit(f'unexpected zlib ARM HWCAP2 guard count: {s.count(old)}')
+          zlib_cpu.write_text(s.replace(old, new, 1))
+
           randposix = Path('base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc')
           s = randposix.read_text()
           old = '#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)\n'
@@ -236,6 +244,7 @@ jobs:
             media/gpu/sandbox/BUILD.gn \
             neva/app_runtime/BUILD.gn \
             third_party/boringssl/src/crypto/cpu_arm_linux.c \
+            third_party/zlib/cpu_features.c \
             base/allocator/partition_allocator/src/partition_alloc/partition_alloc_base/rand_util_posix.cc \
             | tee "$GITHUB_WORKSPACE/lgwos-logs/source-gates.patch"
 
@@ -361,9 +370,11 @@ jobs:
           set -o pipefail
           . "$SDK_ENV"
           cd "$GITHUB_WORKSPACE/src"
+          set +e
           timeout 45m ninja -C "$OUT_DIR" -j2 base \
             2>&1 | tee "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
           RC=${PIPESTATUS[0]}
+          set -e
           echo "BASE_BUILD_RC=$RC" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/base-build.log"
           exit "$RC"
 
