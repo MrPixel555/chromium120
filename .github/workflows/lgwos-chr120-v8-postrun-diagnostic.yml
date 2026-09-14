@@ -1,0 +1,115 @@
+name: LGWOS Chromium120 V8 Post-Run Diagnostic
+
+on:
+  workflow_run:
+    workflows:
+      - LGWOS Chromium120 Incremental V8
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Extract V8 result and commit diagnostic report
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_RUN_ID: ${{ github.event.workflow_run.id }}
+          SOURCE_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          SOURCE_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v8diag/extracted"
+          cd "$RUNNER_TEMP/v8diag"
+
+          API="https://api.github.com/repos/$GITHUB_REPOSITORY"
+          AUTH=(-H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28")
+
+          curl -fsSL "${AUTH[@]}" "$API/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100" -o artifacts.json
+          ARTIFACT_ID="$(jq -r '.artifacts[] | select(.name == "lgwos-chr120-incremental-v8-logs") | .id' artifacts.json | head -1)"
+
+          {
+            echo 'LGWOS Chromium120 V8 Post-Run Diagnostic'
+            echo "SOURCE_RUN_ID=$SOURCE_RUN_ID"
+            echo "SOURCE_CONCLUSION=$SOURCE_CONCLUSION"
+            echo "SOURCE_HEAD_SHA=$SOURCE_HEAD_SHA"
+            echo "CAPTURED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "ARTIFACT_ID=${ARTIFACT_ID:-NONE}"
+            echo
+          } > report.txt
+
+          if [ -n "${ARTIFACT_ID:-}" ]; then
+            curl -fL --retry 3 --retry-delay 2 "${AUTH[@]}" "$API/actions/artifacts/$ARTIFACT_ID/zip" -o logs.zip
+            unzip -q logs.zip -d extracted
+
+            append_file() {
+              local title="$1"
+              local pattern="$2"
+              local maxlines="$3"
+              local file
+              file="$(find extracted -type f -name "$pattern" -print -quit)"
+              {
+                echo "===== $title ====="
+                if [ -n "$file" ]; then
+                  tail -n "$maxlines" "$file"
+                else
+                  echo "MISSING: $pattern"
+                fi
+                echo
+              } >> report.txt
+            }
+
+            append_file 'FINAL SUMMARY' 'final-summary.log' 200
+            append_file 'RUNNER CAPACITY' 'runner-capacity.log' 200
+            append_file 'MTIME NORMALIZATION' 'mtime-normalization.log' 200
+            append_file 'INCREMENTAL AUDIT' 'incremental-audit.log' 500
+            append_file 'GN GENERATION' 'gn-gen.log' 250
+
+            BUILD_LOG="$(find extracted -type f -name 'weboswebruntime-build.log' -print -quit)"
+            {
+              echo '===== FOCUSED BUILD FAILURE CONTEXT ====='
+              if [ -n "$BUILD_LOG" ]; then
+                grep -n -B 15 -A 55 -E 'FAILED:|fatal error:|(^|[^A-Za-z])error:|undefined reference|collect2:|ld: |cannot find|No such file|not found|ninja: build stopped|Killed|timed out|timeout|target specific option mismatch' "$BUILD_LOG" | tail -n 1200 || true
+                echo
+                echo '===== BUILD LOG TAIL ====='
+                tail -n 600 "$BUILD_LOG"
+              else
+                echo 'MISSING: weboswebruntime-build.log'
+              fi
+              echo
+            } >> report.txt
+          else
+            echo 'No V8 log artifact was published for this run.' >> report.txt
+          fi
+
+          REPORT_PATH='lgwos-diagnostics/v8-latest.txt'
+          EXISTING_JSON="$(curl -sS "${AUTH[@]}" "$API/contents/$REPORT_PATH?ref=master" || true)"
+          EXISTING_SHA="$(printf '%s' "$EXISTING_JSON" | jq -r '.sha // empty' 2>/dev/null || true)"
+          CONTENT_B64="$(base64 -w0 report.txt)"
+
+          if [ -n "$EXISTING_SHA" ]; then
+            jq -n \
+              --arg message "diag: capture V8 run $SOURCE_RUN_ID ($SOURCE_CONCLUSION)" \
+              --arg content "$CONTENT_B64" \
+              --arg sha "$EXISTING_SHA" \
+              --arg branch master \
+              '{message:$message, content:$content, sha:$sha, branch:$branch}' > payload.json
+          else
+            jq -n \
+              --arg message "diag: capture V8 run $SOURCE_RUN_ID ($SOURCE_CONCLUSION)" \
+              --arg content "$CONTENT_B64" \
+              --arg branch master \
+              '{message:$message, content:$content, branch:$branch}' > payload.json
+          fi
+
+          curl -fsSL -X PUT "${AUTH[@]}" -H 'Content-Type: application/json' \
+            "$API/contents/$REPORT_PATH" --data-binary @payload.json > commit-result.json
+
+          echo "DIAGNOSTIC_REPORT=$REPORT_PATH"
+          jq -r '"COMMIT_SHA=" + (.commit.sha // "UNKNOWN")' commit-result.json
