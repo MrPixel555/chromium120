@@ -1,0 +1,72 @@
+name: LGWOS V8 relaxed_store Diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-v8-relaxed-store-diagnostic.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout exact Chromium 120 source
+        uses: actions/checkout@v4
+        with:
+          ref: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          clean: true
+
+      - name: Inspect exact V8 source and atomic helpers
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE/src"
+
+          echo '=== TOP-LEVEL PROVENANCE ==='
+          git rev-parse HEAD
+          git status --short
+          git ls-tree HEAD v8 || true
+          test -e v8/.git && { echo '=== V8 .git ==='; ls -ld v8/.git; cat v8/.git 2>/dev/null || true; } || true
+          git -C v8 rev-parse HEAD 2>/dev/null || true
+          git -C v8 status --short 2>/dev/null || true
+
+          echo '=== ISOLATE-INL EXACT LINES 1-230 ==='
+          nl -ba v8/src/execution/isolate-inl.h | sed -n '1,230p'
+
+          echo '=== RELAXED_STORE / RELAXED_LOAD OCCURRENCES ==='
+          grep -R -n -E '\brelaxed_(store|load)\b|\bRelaxed_(Store|Load)\b' \
+            v8/src/base v8/src/execution v8/src/objects 2>/dev/null | head -n 500 || true
+
+          echo '=== ATOMICOPS CANDIDATES ==='
+          find v8/src/base -maxdepth 3 -type f \( -name '*atomic*' -o -name '*memory*' \) -print | sort | head -n 200
+
+          for F in \
+            v8/src/base/atomicops.h \
+            v8/src/base/atomic-utils.h \
+            v8/src/base/platform/atomicops.h \
+            v8/src/base/atomicops_internals_atomicword_compat.h; do
+            if [ -f "$F" ]; then
+              echo "=== $F ==="
+              nl -ba "$F" | sed -n '1,320p'
+            fi
+          done
+
+          echo '=== DEFINITIONS CONTAINING relaxed_store ==='
+          grep -R -n -B 8 -A 12 -E 'relaxed_store|Relaxed_Store' v8/src 2>/dev/null | head -n 800 || true
+
+          echo '=== BUILD FLAGS / ARCH REFERENCES ==='
+          grep -R -n -E 'V8_USE_ATOMIC|ATOMIC_OBJECT|relaxed_store|Relaxed_Store' \
+            v8/BUILD.gn v8/src/base v8/src/execution 2>/dev/null | head -n 800 || true
+
+          echo '=== GCLIENT V8 PIN ==='
+          grep -n -A 3 -B 3 "'src/v8'" "$GITHUB_WORKSPACE/.gclient_entries" 2>/dev/null || true
