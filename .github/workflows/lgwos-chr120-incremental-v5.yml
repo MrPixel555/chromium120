@@ -336,6 +336,7 @@ jobs:
           use_pangocairo=false
           use_vaapi=false
           use_v4l2_codec=false
+          disable_zlib_arm_aes_cflag=true
           use_ozone=true
           ozone_auto_platforms=false
           fatal_linker_warnings=false
