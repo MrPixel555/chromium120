@@ -1,13 +1,15 @@
 diff --git a/src/third_party/lzma_sdk/C/CpuArch.c b/src/third_party/lzma_sdk/C/CpuArch.c
 --- a/src/third_party/lzma_sdk/C/CpuArch.c
 +++ b/src/third_party/lzma_sdk/C/CpuArch.c
-@@ -433,9 +433,16 @@
+@@ -433,9 +433,20 @@
    MY_HWCAP_CHECK_FUNC_2(NEON, ASIMD)
  // MY_HWCAP_CHECK_FUNC (ASIMD)
  #elif defined(MY_CPU_ARM)
 -  #define MY_HWCAP_CHECK_FUNC(name) \
 -  BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
-+  #if defined(__ARM_ARCH) && (__ARM_ARCH >= 8)
++  #if defined(__ARM_ARCH) && (__ARM_ARCH >= 8) && defined(AT_HWCAP2) && \
++      defined(HWCAP2_CRC32) && defined(HWCAP2_SHA1) && \
++      defined(HWCAP2_SHA2) && defined(HWCAP2_AES)
 +    #define MY_HWCAP_CHECK_FUNC(name) \
 +    BoolInt CPU_IsSupported_ ## name() { return (getauxval(AT_HWCAP2) & (HWCAP2_ ## name)) ? 1 : 0; }
 +  #else
