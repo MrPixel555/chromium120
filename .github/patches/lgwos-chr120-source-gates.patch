@@ -125,15 +125,11 @@ index 64e0428cd2..b229a73a26 100644
 diff --git a/src/build/toolchain/cros/BUILD.gn b/src/build/toolchain/cros/BUILD.gn
 --- a/src/build/toolchain/cros/BUILD.gn
 +++ b/src/build/toolchain/cros/BUILD.gn
-@@ -68,9 +68,11 @@ cros_toolchain("target") {
-   if (!lacros_use_chromium_toolchain) {
+@@ -69,6 +69,6 @@ cros_toolchain("target") {
      ar = cros_target_ar
      cc = cros_target_cc
      cxx = cros_target_cxx
 -    ld = cros_target_ld
-+    # LGWOS: Buildroot exports LD as the raw linker, but gcc_toolchain.gni
-+    # passes compiler-driver options such as -Wl,... through `ld`.
 +    ld = cros_target_cxx
  
      if (cros_target_nm != "") {
-       nm = cros_target_nm
