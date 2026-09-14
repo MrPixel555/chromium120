@@ -48,9 +48,9 @@ jobs:
         run: |
           set -euxo pipefail
           cd "$GITHUB_WORKSPACE"
-          COMMIT_EPOCH="$(git show -s --format=%ct "$LGWOS_TARGET_SHA")"
-          git ls-files -z src | xargs -0 -r touch -d "@$COMMIT_EPOCH"
           mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
+          COMMIT_EPOCH="$(git show -s --format=%ct "$LGWOS_TARGET_SHA")"
+          find src -xdev \( -type f -o -type l \) -print0 | xargs -0 -r touch -h -d "@$COMMIT_EPOCH"
           {
             echo "LGWOS_TARGET_SHA=$LGWOS_TARGET_SHA"
             echo "COMMIT_EPOCH=$COMMIT_EPOCH"
@@ -267,6 +267,7 @@ jobs:
         shell: bash
         run: |
           set +e
+          mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
           { echo "HEAD=$(git rev-parse HEAD 2>/dev/null || true)"; echo "SYSDEPS_CACHE_HIT=${{ steps.sysdeps_cache.outputs.cache-hit }}"; echo "CHROMIUM_CACHE_HIT=${{ steps.chromium_cache.outputs.cache-hit }}"; grep -h '^GN_RC=' "$GITHUB_WORKSPACE/lgwos-logs/gn-gen.log" 2>/dev/null || true; grep -h '^WEBOSWEBRUNTIME_BUILD_RC=' "$GITHUB_WORKSPACE/lgwos-logs/weboswebruntime-build.log" 2>/dev/null || true; df -h /; } | tee "$GITHUB_WORKSPACE/lgwos-logs/final-summary.log"
 
       - name: Upload logs
