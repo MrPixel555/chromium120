@@ -49,7 +49,22 @@ jobs:
           set -euxo pipefail
           mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends bc binutils bzip2 ca-certificates cpio curl file gcc g++ gzip libglib2.0-dev libnspr4-dev libnss3-dev make ninja-build patch perl pkg-config python3 python3-six rsync tar unzip wget xz-utils
+          sudo apt-get install -y --no-install-recommends bc binutils bzip2 ca-certificates cpio curl file gcc g++ g++-multilib gzip libglib2.0-dev libnspr4-dev libnss3-dev make ninja-build patch perl pkg-config python3 python3-six rsync tar unzip wget xz-utils
+          cat > "$RUNNER_TEMP/lgwos-x86-multilib-smoke.cc" <<'EOF'
+          #include <atomic>
+          int main() {
+            std::atomic<int> value{0};
+            return value.load();
+          }
+          EOF
+          sed -i 's/^          //' "$RUNNER_TEMP/lgwos-x86-multilib-smoke.cc"
+          CLANGXX="$GITHUB_WORKSPACE/src/third_party/llvm-build/Release+Asserts/bin/clang++"
+          test -x "$CLANGXX"
+          "$CLANGXX" -m32 -std=c++20 "$RUNNER_TEMP/lgwos-x86-multilib-smoke.cc" -o "$RUNNER_TEMP/lgwos-x86-multilib-smoke" 2>&1 | tee "$GITHUB_WORKSPACE/lgwos-logs/x86-multilib-smoke.log"
+          file "$RUNNER_TEMP/lgwos-x86-multilib-smoke" | tee -a "$GITHUB_WORKSPACE/lgwos-logs/x86-multilib-smoke.log"
+          file "$RUNNER_TEMP/lgwos-x86-multilib-smoke" | grep -q 'ELF 32-bit'
+          "$RUNNER_TEMP/lgwos-x86-multilib-smoke"
+          echo X86_MULTILIB_SMOKE_RC=0 | tee -a "$GITHUB_WORKSPACE/lgwos-logs/x86-multilib-smoke.log"
 
       - name: Create Debian multiarch pkg-config bridge
         shell: bash
