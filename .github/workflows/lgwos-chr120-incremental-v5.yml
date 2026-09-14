@@ -195,15 +195,15 @@ jobs:
           app = Path('neva/app_runtime/BUILD.gn')
           s = app.read_text()
           old = '''  repack_locales("locales_repack") {
-            source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
-            deps = [ ":app_runtime_network_error_strings" ]
+              source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
+              deps = [ ":app_runtime_network_error_strings" ]
           '''
           new = '''  repack_locales("locales_repack") {
-            source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
-            deps = [
-              ":app_runtime_network_error_strings",
-              ":repack",
-            ]
+              source_patterns = [ "${root_gen_dir}/neva/app_runtime/locales/" ]
+              deps = [
+                ":app_runtime_network_error_strings",
+                ":repack",
+              ]
           '''
           if s.count(old) != 1:
               raise SystemExit(f'unexpected locales_repack anchor count: {s.count(old)}')
