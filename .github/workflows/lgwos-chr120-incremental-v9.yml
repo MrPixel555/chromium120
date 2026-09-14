@@ -2,6 +2,11 @@ name: LGWOS Chromium120 Incremental V9
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-chr120-incremental-v9.yml
 
 permissions:
   contents: read
