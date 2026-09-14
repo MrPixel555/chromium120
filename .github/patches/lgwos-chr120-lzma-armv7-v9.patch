@@ -39,7 +39,7 @@ index 0b559ec..827b707 100644
 diff --git a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc b/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
 --- a/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
 +++ b/src/third_party/crashpad/crashpad/util/file/file_io_posix.cc
-@@ -19,6 +19,12 @@
+@@ -21,5 +21,11 @@
  #include <sys/stat.h>
  #include <unistd.h>
  
