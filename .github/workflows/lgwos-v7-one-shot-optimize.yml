@@ -30,105 +30,97 @@ jobs:
           from pathlib import Path
 
           p = Path('.github/workflows/lgwos-chr120-incremental-v7.yml')
-          s = p.read_text()
+          lines = p.read_text().splitlines()
+          out = []
+          inserted_args = False
+          inserted_mtime = False
+          tuned_build = False
+          in_build = False
 
-          def replace_once(old, new, label):
-              global s
-              n = s.count(old)
-              if n != 1:
-                  raise SystemExit(f'{label}: expected exactly 1 match, got {n}')
-              s = s.replace(old, new, 1)
+          for line in lines:
+              if line == '    timeout-minutes: 180':
+                  line = '    timeout-minutes: 330'
 
-          replace_once(
-              '    timeout-minutes: 180\n',
-              '    timeout-minutes: 330\n',
-              'job timeout')
+              if line == '      - name: Patch source compatibility gates, Neva locale dependency, legacy ARM APIs, and skcms FP16 gate':
+                  if inserted_mtime:
+                      raise SystemExit('mtime step duplicate')
+                  out.extend([
+                      '      - name: Normalize source mtimes for real incremental reuse',
+                      '        shell: bash',
+                      '        run: |',
+                      '          set -euxo pipefail',
+                      '          cd "$GITHUB_WORKSPACE/src"',
+                      '          COMMIT_EPOCH="$(git show -s --format=%ct "$LGWOS_TARGET_SHA")"',
+                      '          git ls-files -z . | xargs -0 -r touch -d "@$COMMIT_EPOCH"',
+                      '          {',
+                      '            echo "LGWOS_TARGET_SHA=$LGWOS_TARGET_SHA"',
+                      '            echo "COMMIT_EPOCH=$COMMIT_EPOCH"',
+                      '            echo "NORMALIZED_UTC=$(date -u -d "@$COMMIT_EPOCH" +%Y-%m-%dT%H:%M:%SZ)"',
+                      '          } | tee "$GITHUB_WORKSPACE/lgwos-logs/mtime-normalization.log"',
+                      '',
+                  ])
+                  inserted_mtime = True
 
-          replace_once(
-              '          use_ozone=true\n          ozone_auto_platforms=false\n',
-              '          use_ozone=true\n          use_libpci=false\n          use_udev=false\n          ozone_auto_platforms=false\n',
-              'desktop Linux dependency args')
+              if line == '          use_ozone=true':
+                  out.append(line)
+                  out.append('          use_libpci=false')
+                  out.append('          use_udev=false')
+                  inserted_args = True
+                  continue
 
-          patch_anchor = '      - name: Patch source compatibility gates, Neva locale dependency, legacy ARM APIs, and skcms FP16 gate\n'
-          normalize_step = '''      - name: Normalize source mtimes for real incremental reuse
-        shell: bash
-        run: |
-          set -euxo pipefail
-          cd "$GITHUB_WORKSPACE/src"
-          COMMIT_EPOCH="$(git show -s --format=%ct "$LGWOS_TARGET_SHA")"
-          FILE_COUNT="$(git ls-files -z . | tr -cd '\\0' | wc -c)"
-          git ls-files -z . | xargs -0 -r touch -d "@$COMMIT_EPOCH"
-          {
-            echo "LGWOS_TARGET_SHA=$LGWOS_TARGET_SHA"
-            echo "COMMIT_EPOCH=$COMMIT_EPOCH"
-            echo "TRACKED_FILES_NORMALIZED=$FILE_COUNT"
-            echo "NORMALIZED_UTC=$(date -u -d "@$COMMIT_EPOCH" +%Y-%m-%dT%H:%M:%SZ)"
-          } | tee "$GITHUB_WORKSPACE/lgwos-logs/mtime-normalization.log"
+              if line == '      - name: Build webOS web runtime':
+                  in_build = True
 
-'''
-          replace_once(patch_anchor, normalize_step + patch_anchor, 'mtime normalization insertion')
+              if in_build and line == '          cd "$GITHUB_WORKSPACE/src"':
+                  out.append(line)
+                  out.extend([
+                      '',
+                      '          CPU_JOBS="$(nproc)"',
+                      '          MEM_KB="$(awk \'/MemTotal:/ {print $2}\' /proc/meminfo)"',
+                      '          MEM_JOBS=$(( MEM_KB / 1800000 ))',
+                      '          if [ "$MEM_JOBS" -lt 2 ]; then MEM_JOBS=2; fi',
+                      '          JOBS="$CPU_JOBS"',
+                      '          if [ "$JOBS" -gt "$MEM_JOBS" ]; then JOBS="$MEM_JOBS"; fi',
+                      '          if [ "$JOBS" -gt 6 ]; then JOBS=6; fi',
+                      '          if [ "$JOBS" -lt 2 ]; then JOBS=2; fi',
+                      '          export NINJA_STATUS=\'[%f/%t %p | active=%r | elapsed=%es | rate=%o/s] \'',
+                      '          {',
+                      '            echo "CPU_JOBS=$CPU_JOBS"',
+                      '            echo "MEM_KB=$MEM_KB"',
+                      '            echo "MEM_JOBS=$MEM_JOBS"',
+                      '            echo "NINJA_JOBS=$JOBS"',
+                      '            free -h',
+                      '          } | tee "$GITHUB_WORKSPACE/lgwos-logs/runner-capacity.log"',
+                      '',
+                      '          set +e',
+                      '          ninja -C "$OUT_DIR" -n -d explain webos:weboswebruntime > "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" 2>&1',
+                      '          DRY_RC=$?',
+                      '          set -e',
+                      '          {',
+                      '            echo "NINJA_DRY_RUN_RC=$DRY_RC"',
+                      '            echo "DIRTY_REASON_COUNT=$(grep -c \'^ninja explain:\' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true)"',
+                      '            grep \'^ninja explain:\' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" | head -n 120 || true',
+                      '            tail -n 40 "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true',
+                      '          } | tee "$GITHUB_WORKSPACE/lgwos-logs/incremental-audit.log"',
+                  ])
+                  tuned_build = True
+                  continue
 
-          build_prefix = '''      - name: Build webOS web runtime
-        shell: bash
-        run: |
-          set -o pipefail
-          . "$SDK_ENV"
-          cd "$GITHUB_WORKSPACE/src"
-          set +e
-'''
-          build_new = '''      - name: Build webOS web runtime
-        shell: bash
-        run: |
-          set -o pipefail
-          . "$SDK_ENV"
-          cd "$GITHUB_WORKSPACE/src"
+              if in_build and line == '          timeout 90m ninja -C "$OUT_DIR" -j2 webos:weboswebruntime \\':
+                  line = '          timeout 300m ninja -C "$OUT_DIR" -j"$JOBS" webos:weboswebruntime \\'
 
-          CPU_JOBS="$(nproc)"
-          MEM_KB="$(awk '/MemTotal:/ {print $2}' /proc/meminfo)"
-          MEM_JOBS=$(( MEM_KB / 1800000 ))
-          if [ "$MEM_JOBS" -lt 2 ]; then MEM_JOBS=2; fi
-          JOBS="$CPU_JOBS"
-          if [ "$JOBS" -gt "$MEM_JOBS" ]; then JOBS="$MEM_JOBS"; fi
-          if [ "$JOBS" -gt 6 ]; then JOBS=6; fi
-          if [ "$JOBS" -lt 2 ]; then JOBS=2; fi
-          export NINJA_STATUS='[%f/%t %p | active=%r | elapsed=%es | rate=%o/s] '
+              out.append(line)
 
-          {
-            echo "CPU_JOBS=$CPU_JOBS"
-            echo "MEM_KB=$MEM_KB"
-            echo "MEM_JOBS=$MEM_JOBS"
-            echo "NINJA_JOBS=$JOBS"
-            echo "NINJA_STATUS=$NINJA_STATUS"
-            free -h
-            lscpu | grep -E '^(CPU\\(s\\)|Model name|Thread|Core|Socket)' || true
-          } | tee "$GITHUB_WORKSPACE/lgwos-logs/runner-capacity.log"
-
-          # Prove what Ninja still considers dirty after checkpoint restore and
-          # source-mtime normalization. This is a dry run only.
-          set +e
-          ninja -C "$OUT_DIR" -n -d explain webos:weboswebruntime \
-            > "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" 2>&1
-          DRY_RC=$?
-          set -e
-          {
-            echo "NINJA_DRY_RUN_RC=$DRY_RC"
-            echo "DIRTY_REASON_COUNT=$(grep -c '^ninja explain:' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true)"
-            echo '=== FIRST 120 EXPLANATIONS ==='
-            grep '^ninja explain:' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" | head -n 120 || true
-            echo '=== DRY RUN TAIL ==='
-            tail -n 40 "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true
-          } | tee "$GITHUB_WORKSPACE/lgwos-logs/incremental-audit.log"
-
-          set +e
-'''
-          replace_once(build_prefix, build_new, 'build telemetry insertion')
-
-          replace_once(
-              '          timeout 90m ninja -C "$OUT_DIR" -j2 webos:weboswebruntime \\\n',
-              '          timeout 300m ninja -C "$OUT_DIR" -j"$JOBS" webos:weboswebruntime \\\n',
-              'ninja parallelism and timeout')
-
-          p.write_text(s)
+          if not inserted_args:
+              raise SystemExit('use_ozone anchor not found')
+          if not inserted_mtime:
+              raise SystemExit('patch-step anchor not found')
+          if not tuned_build:
+              raise SystemExit('build-step anchor not found')
+          text = '\n'.join(out) + '\n'
+          if 'timeout 90m ninja' in text or '-j2 webos:weboswebruntime' in text:
+              raise SystemExit('old ninja invocation still present')
+          p.write_text(text)
           PY
 
           git diff --check
