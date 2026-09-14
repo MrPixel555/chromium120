@@ -1,0 +1,107 @@
+name: LGWOS V8 Checkpoint Provenance
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-v8-checkpoint-provenance.yml
+
+permissions:
+  contents: read
+
+env:
+  LGWOS_TARGET_SHA: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+  WEBOS_SDK_SHA256: 04ad3311b48b4557a7002aef56ae2e167478e8e129f37daac04649bddf813616
+  CHROMIUM_CHECKPOINT_SCHEMA: chromium-out-v3
+  OUT_DIR: out/LGWOS-Probe
+
+jobs:
+  provenance:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout exact Chromium 120 source
+        uses: actions/checkout@v4
+        with:
+          ref: e6a73fffdbe3bcc6f7fc33316c74adc6e7c01853
+          fetch-depth: 1
+          submodules: false
+          lfs: false
+          clean: true
+
+      - name: Baseline V8 source fingerprint
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE/src"
+          mkdir -p "$GITHUB_WORKSPACE/lgwos-logs"
+          {
+            echo '=== BASELINE ==='
+            git rev-parse HEAD
+            sha256sum v8/src/execution/isolate-inl.h
+            stat -c '%n size=%s mtime=%y inode=%i' v8/src/execution/isolate-inl.h
+            grep -n -E 'relaxed_store|Relaxed_Store|isolate_addresses_|kContextAddress' v8/src/execution/isolate-inl.h || true
+            echo '--- set_context ---'
+            grep -n -A 12 -B 4 'void Isolate::set_context' v8/src/execution/isolate-inl.h || true
+            echo '--- git status ---'
+            git status --short -- v8/src/execution/isolate-inl.h
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/baseline.log"
+
+      - name: Restore latest Chromium incremental checkpoint
+        id: chromium_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: src/out/LGWOS-Probe
+          key: lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-${{ github.run_id }}
+          restore-keys: |
+            lgwos-${{ env.CHROMIUM_CHECKPOINT_SCHEMA }}-${{ env.LGWOS_TARGET_SHA }}-${{ env.WEBOS_SDK_SHA256 }}-
+          fail-on-cache-miss: true
+
+      - name: Inspect source and restored checkpoint
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE/src"
+          LOG="$GITHUB_WORKSPACE/lgwos-logs/checkpoint-provenance.log"
+          {
+            echo '=== CACHE ==='
+            echo "CACHE_HIT=${{ steps.chromium_cache.outputs.cache-hit }}"
+            du -sh "$OUT_DIR" || true
+            echo
+            echo '=== SOURCE AFTER CACHE RESTORE ==='
+            sha256sum v8/src/execution/isolate-inl.h
+            stat -c '%n size=%s mtime=%y inode=%i' v8/src/execution/isolate-inl.h
+            grep -n -E 'relaxed_store|Relaxed_Store|isolate_addresses_|kContextAddress' v8/src/execution/isolate-inl.h || true
+            grep -n -A 12 -B 4 'void Isolate::set_context' v8/src/execution/isolate-inl.h || true
+            git status --short -- v8/src/execution/isolate-inl.h
+            echo
+            echo '=== CHECKPOINT STRING SEARCH ==='
+            grep -R -n -I -m 100 -E 'relaxed_store|isolate_addresses_|kContextAddress' "$OUT_DIR" 2>/dev/null || true
+            echo
+            echo '=== NINJA COMMAND FOR FAILING OBJECT ==='
+            ninja -C "$OUT_DIR" -t commands obj/v8/v8_compiler/js-call-reducer.o 2>&1 || true
+            echo
+            echo '=== NINJA QUERY FOR FAILING OBJECT ==='
+            ninja -C "$OUT_DIR" -t query obj/v8/v8_compiler/js-call-reducer.o 2>&1 || true
+            echo
+            echo '=== NINJA DEPS FOR FAILING OBJECT ==='
+            ninja -C "$OUT_DIR" -t deps obj/v8/v8_compiler/js-call-reducer.o 2>&1 | head -n 500 || true
+            echo
+            echo '=== CANDIDATE GENERATED/PREPROCESSED FILES ==='
+            find "$OUT_DIR" -type f \( -name '*js-call-reducer*' -o -name '*isolate-inl*' -o -name '*.rsp' \) -print | sort | head -n 500
+            echo
+            echo '=== BUILD.NINJA REFERENCES ==='
+            grep -R -n -I -m 200 -E 'js-call-reducer\.o|isolate-inl\.h' "$OUT_DIR"/*.ninja "$OUT_DIR"/obj 2>/dev/null || true
+          } | tee "$LOG"
+
+      - name: Upload provenance logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lgwos-v8-checkpoint-provenance
+          path: lgwos-logs
+          if-no-files-found: warn
+          retention-days: 14
