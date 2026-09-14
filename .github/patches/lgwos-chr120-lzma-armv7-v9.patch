@@ -63,7 +63,7 @@ diff --git a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc b/src/third
  #include <sys/uio.h>
  
 +#ifndef PTRACE_GETREGSET
-+#define PTRACE_GETREGSET 0x4204
++#define PTRACE_GETREGSET static_cast<enum __ptrace_request>(0x4204)
 +#endif
 +
  #include "base/check_op.h"
