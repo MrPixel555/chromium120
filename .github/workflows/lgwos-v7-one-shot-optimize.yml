@@ -1,0 +1,146 @@
+name: LGWOS V7 One-Shot Optimizer
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/lgwos-v7-one-shot-optimize.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch-v7:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout workflow branch
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 1
+
+      - name: Patch V7 workflow
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('.github/workflows/lgwos-chr120-incremental-v7.yml')
+          s = p.read_text()
+
+          def replace_once(old, new, label):
+              global s
+              n = s.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, got {n}')
+              s = s.replace(old, new, 1)
+
+          replace_once(
+              '    timeout-minutes: 180\n',
+              '    timeout-minutes: 330\n',
+              'job timeout')
+
+          replace_once(
+              '          use_ozone=true\n          ozone_auto_platforms=false\n',
+              '          use_ozone=true\n          use_libpci=false\n          use_udev=false\n          ozone_auto_platforms=false\n',
+              'desktop Linux dependency args')
+
+          patch_anchor = '      - name: Patch source compatibility gates, Neva locale dependency, legacy ARM APIs, and skcms FP16 gate\n'
+          normalize_step = '''      - name: Normalize source mtimes for real incremental reuse
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cd "$GITHUB_WORKSPACE/src"
+          COMMIT_EPOCH="$(git show -s --format=%ct "$LGWOS_TARGET_SHA")"
+          FILE_COUNT="$(git ls-files -z . | tr -cd '\\0' | wc -c)"
+          git ls-files -z . | xargs -0 -r touch -d "@$COMMIT_EPOCH"
+          {
+            echo "LGWOS_TARGET_SHA=$LGWOS_TARGET_SHA"
+            echo "COMMIT_EPOCH=$COMMIT_EPOCH"
+            echo "TRACKED_FILES_NORMALIZED=$FILE_COUNT"
+            echo "NORMALIZED_UTC=$(date -u -d "@$COMMIT_EPOCH" +%Y-%m-%dT%H:%M:%SZ)"
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/mtime-normalization.log"
+
+'''
+          replace_once(patch_anchor, normalize_step + patch_anchor, 'mtime normalization insertion')
+
+          build_prefix = '''      - name: Build webOS web runtime
+        shell: bash
+        run: |
+          set -o pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+          set +e
+'''
+          build_new = '''      - name: Build webOS web runtime
+        shell: bash
+        run: |
+          set -o pipefail
+          . "$SDK_ENV"
+          cd "$GITHUB_WORKSPACE/src"
+
+          CPU_JOBS="$(nproc)"
+          MEM_KB="$(awk '/MemTotal:/ {print $2}' /proc/meminfo)"
+          MEM_JOBS=$(( MEM_KB / 1800000 ))
+          if [ "$MEM_JOBS" -lt 2 ]; then MEM_JOBS=2; fi
+          JOBS="$CPU_JOBS"
+          if [ "$JOBS" -gt "$MEM_JOBS" ]; then JOBS="$MEM_JOBS"; fi
+          if [ "$JOBS" -gt 6 ]; then JOBS=6; fi
+          if [ "$JOBS" -lt 2 ]; then JOBS=2; fi
+          export NINJA_STATUS='[%f/%t %p | active=%r | elapsed=%es | rate=%o/s] '
+
+          {
+            echo "CPU_JOBS=$CPU_JOBS"
+            echo "MEM_KB=$MEM_KB"
+            echo "MEM_JOBS=$MEM_JOBS"
+            echo "NINJA_JOBS=$JOBS"
+            echo "NINJA_STATUS=$NINJA_STATUS"
+            free -h
+            lscpu | grep -E '^(CPU\\(s\\)|Model name|Thread|Core|Socket)' || true
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/runner-capacity.log"
+
+          # Prove what Ninja still considers dirty after checkpoint restore and
+          # source-mtime normalization. This is a dry run only.
+          set +e
+          ninja -C "$OUT_DIR" -n -d explain webos:weboswebruntime \
+            > "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" 2>&1
+          DRY_RC=$?
+          set -e
+          {
+            echo "NINJA_DRY_RUN_RC=$DRY_RC"
+            echo "DIRTY_REASON_COUNT=$(grep -c '^ninja explain:' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true)"
+            echo '=== FIRST 120 EXPLANATIONS ==='
+            grep '^ninja explain:' "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" | head -n 120 || true
+            echo '=== DRY RUN TAIL ==='
+            tail -n 40 "$GITHUB_WORKSPACE/lgwos-logs/ninja-dry-run-explain.log" || true
+          } | tee "$GITHUB_WORKSPACE/lgwos-logs/incremental-audit.log"
+
+          set +e
+'''
+          replace_once(build_prefix, build_new, 'build telemetry insertion')
+
+          replace_once(
+              '          timeout 90m ninja -C "$OUT_DIR" -j2 webos:weboswebruntime \\\n',
+              '          timeout 300m ninja -C "$OUT_DIR" -j"$JOBS" webos:weboswebruntime \\\n',
+              'ninja parallelism and timeout')
+
+          p.write_text(s)
+          PY
+
+          git diff --check
+          git diff -- .github/workflows/lgwos-chr120-incremental-v7.yml
+
+      - name: Commit optimized V7
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/lgwos-chr120-incremental-v7.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "ci: fix libpci blocker and make V7 truly incremental"
+          git push origin HEAD:master
