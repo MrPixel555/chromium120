@@ -143,3 +143,25 @@ diff --git a/src/build/toolchain/linux/BUILD.gn b/src/build/toolchain/linux/BUIL
      v8_current_cpu = "arm"
    }
  }
+diff --git a/src/media/capture/video/linux/v4l2_capture_delegate.cc b/src/media/capture/video/linux/v4l2_capture_delegate.cc
+--- a/src/media/capture/video/linux/v4l2_capture_delegate.cc
++++ b/src/media/capture/video/linux/v4l2_capture_delegate.cc
+@@ -1222,5 +1222,11 @@
+ #if BUILDFLAG(IS_LINUX)
+ gfx::ColorSpace V4L2CaptureDelegate::BuildColorSpaceFromv4l2() {
++#if defined(OS_WEBOS)
++  // The legacy webOS SDK exposes a pre-extended V4L2 UAPI without the
++  // quantization, YCbCr encoding, and transfer-function fields used below.
++  // Preserve capture support and report an unspecified color space instead.
++  return gfx::ColorSpace();
++#else
+   v4l2_colorspace v4l2_primary = (v4l2_colorspace)video_fmt_.fmt.pix.colorspace;
+   v4l2_quantization v4l2_range =
+       (v4l2_quantization)video_fmt_.fmt.pix.quantization;
+@@ -1408,5 +1414,6 @@
+   DVLOG(2) << __func__ << "build color space:"
+            << gfx::ColorSpace(primary, transfer, matrix, range).ToString();
+   return gfx::ColorSpace(primary, transfer, matrix, range);
++#endif  // defined(OS_WEBOS)
+ }
+ #endif
