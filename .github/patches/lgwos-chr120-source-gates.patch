@@ -313,3 +313,24 @@ diff --git a/src/sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.c
  
  #include "media/gpu/buildflags.h"
  #include "sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.h"
+diff --git a/src/third_party/wayland/src/cursor/os-compatibility.c b/src/third_party/wayland/src/cursor/os-compatibility.c
+--- a/src/third_party/wayland/src/cursor/os-compatibility.c
++++ b/src/third_party/wayland/src/cursor/os-compatibility.c
+@@ -38,7 +38,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
+-#ifdef HAVE_MEMFD_CREATE
++#if defined(HAVE_MEMFD_CREATE) && !defined(OS_WEBOS)
+ #include <sys/mman.h>
+ #endif
+ 
+@@ -123,7 +123,7 @@ os_create_anonymous_file(off_t size)
+ 	size_t name_size;
+ 	int fd;
+ 
+-#ifdef HAVE_MEMFD_CREATE
++#if defined(HAVE_MEMFD_CREATE) && !defined(OS_WEBOS)
+ 	fd = memfd_create("wayland-cursor", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+ 	if (fd >= 0) {
+ 		/* We can add this seal before calling posix_fallocate(), as
