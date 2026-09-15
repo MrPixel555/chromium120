@@ -296,3 +296,20 @@ diff --git a/src/sandbox/policy/linux/bpf_network_policy_linux.cc b/src/sandbox/
  #include <unistd.h>
  
  #include "base/feature_list.h"
+diff --git a/src/sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.cc b/src/sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.cc
+--- a/src/sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.cc
++++ b/src/sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.cc
+@@ -4,7 +4,13 @@
+ 
+ #include "sandbox/policy/linux/bpf_hardware_video_decoding_policy_linux.h"
+ 
++#if defined(OS_WEBOS)
++// Linux UAPI defines KCMP_FILE as type 0. The legacy webOS SDK predates
++// linux/kcmp.h, while Chromium supplies the ARM __NR_kcmp syscall number.
++#define KCMP_FILE 0
++#else
+ #include <linux/kcmp.h>
++#endif
+ 
+ #include "media/gpu/buildflags.h"
+ #include "sandbox/linux/seccomp-bpf-helpers/sigsys_handlers.h"
