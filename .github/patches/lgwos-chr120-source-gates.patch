@@ -165,3 +165,72 @@ diff --git a/src/media/capture/video/linux/v4l2_capture_delegate.cc b/src/media/
 +#endif  // defined(OS_WEBOS)
  }
  #endif
+diff --git a/src/mojo/core/channel_linux.cc b/src/mojo/core/channel_linux.cc
+index f48806a..39f5dde 100644
+--- a/src/mojo/core/channel_linux.cc
++++ b/src/mojo/core/channel_linux.cc
+@@ -6,7 +6,9 @@
+ 
+ #include <fcntl.h>
+ #include <linux/futex.h>
++#if !defined(OS_WEBOS)
+ #include <linux/memfd.h>
++#endif
+ #include <sys/eventfd.h>
+ #include <sys/mman.h>
+ #include <sys/syscall.h>
+@@ -112,7 +114,9 @@ class DataAvailableNotifier {
+ 
+ namespace {
+ 
++#if !defined(OS_WEBOS)
+ constexpr int kMemFDSeals = F_SEAL_SEAL | F_SEAL_SHRINK | F_SEAL_GROW;
++#endif
+ 
+ std::atomic_bool g_params_set{false};
+ std::atomic_bool g_use_shared_mem{false};
+@@ -138,6 +142,18 @@ constexpr size_t RoundUpToWordBoundary(size_t size) {
+   return base::bits::AlignUp(size, sizeof(void*));
+ }
+ 
++#if defined(OS_WEBOS)
++// LGWOS: the target kernel is 3.10.x. Chromium itself requires Linux 4.x+
++// before enabling this optional memfd/eventfd channel upgrade, so keep the
++// socket-backed ChannelPosix path and avoid depending on newer memfd UAPI.
++base::ScopedFD CreateSealedMemFD(size_t) {
++  return {};
++}
++
++bool ValidateFDIsProperlySealedMemFD(const base::ScopedFD&) {
++  return false;
++}
++#else
+ base::ScopedFD CreateSealedMemFD(size_t size) {
+   CHECK_GT(size, 0u);
+   CHECK_EQ(size % base::GetPageSize(), 0u);
+@@ -175,6 +191,7 @@ bool ValidateFDIsProperlySealedMemFD(const base::ScopedFD& fd) {
+ 
+   return seals == kMemFDSeals;
+ }
++#endif  // defined(OS_WEBOS)
+ 
+ // EventFDNotifier is an implementation of the DataAvailableNotifier interface
+ // which uses EventFDNotifier to signal the reader.
+@@ -909,6 +926,9 @@ void ChannelLinux::OfferSharedMemUpgradeInternal() {
+ 
+ // static
+ bool ChannelLinux::KernelSupportsUpgradeRequirements() {
++#if defined(OS_WEBOS)
++  return false;
++#else
+   static bool supported = []() -> bool {
+     // See https://crbug.com/1192696 for more context, but some Android vendor
+     // kernels pre-3.17 would use higher undefined syscall numbers for private
+@@ -947,6 +967,7 @@ bool ChannelLinux::KernelSupportsUpgradeRequirements() {
+     return memfd_supported && EventFDNotifier::KernelSupported();
+   }();
+   return supported;
++#endif  // defined(OS_WEBOS)
+ }
+ 
+ // static
