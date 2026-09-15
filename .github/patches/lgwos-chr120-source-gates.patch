@@ -334,3 +334,18 @@ diff --git a/src/third_party/wayland/src/cursor/os-compatibility.c b/src/third_p
  	fd = memfd_create("wayland-cursor", MFD_CLOEXEC | MFD_ALLOW_SEALING);
  	if (fd >= 0) {
  		/* We can add this seal before calling posix_fallocate(), as
+diff --git a/src/third_party/wayland/include/config.h b/src/third_party/wayland/include/config.h
+--- a/src/third_party/wayland/include/config.h
++++ b/src/third_party/wayland/include/config.h
+@@ -8,7 +8,11 @@
+ 
+ #define HAVE_BROKEN_MSG_CMSG_CLOEXEC 0
+ 
++#if defined(OS_WEBOS)
++#undef HAVE_MEMFD_CREATE
++#else
+ #define HAVE_MEMFD_CREATE
++#endif
+ 
+ #define HAVE_MKOSTEMP
+ 
