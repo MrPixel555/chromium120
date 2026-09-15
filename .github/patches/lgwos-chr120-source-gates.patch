@@ -234,3 +234,20 @@ index f48806a..39f5dde 100644
  }
  
  // static
+diff --git a/src/sandbox/policy/linux/bpf_cros_amd_gpu_policy_linux.cc b/src/sandbox/policy/linux/bpf_cros_amd_gpu_policy_linux.cc
+--- a/src/sandbox/policy/linux/bpf_cros_amd_gpu_policy_linux.cc
++++ b/src/sandbox/policy/linux/bpf_cros_amd_gpu_policy_linux.cc
+@@ -6,7 +6,13 @@
+ 
+ #include <errno.h>
+ #include <fcntl.h>
++#if defined(OS_WEBOS)
++// Linux UAPI defines KCMP_FILE as type 0. The legacy webOS SDK predates
++// linux/kcmp.h, while Chromium supplies the ARM __NR_kcmp syscall number.
++#define KCMP_FILE 0
++#else
+ #include <linux/kcmp.h>
++#endif
+ #include <sys/socket.h>
+ 
+ // Some arch's (arm64 for instance) unistd.h don't pull in symbols used here
