@@ -270,8 +270,11 @@ jobs:
           use_v4l2_codec=false
           disable_zlib_arm_aes_cflag=true
           use_ozone=true
+          use_x11=false
           use_libpci=false
           ozone_auto_platforms=false
+          import("//neva/gow.gn")
+          import("//neva/iow.gn")
           fatal_linker_warnings=false
           treat_warnings_as_errors=false
           use_debug_fission=false
