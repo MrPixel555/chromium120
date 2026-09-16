@@ -153,3 +153,42 @@ diff --git a/src/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc b/s
        return;
      }
      zcr_extended_text_input_v1_set_large_surrounding_text(
+
+diff --git a/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.h b/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.h
+--- a/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.h
++++ b/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.h
+@@ -59,9 +59,9 @@ class WaylandExtensionsWebosImpl : public WaylandExtensions,
+       PlatformWindowDelegate* delegate,
+       WaylandConnection* connection) override;
+ 
+-#if defined(USE_NEVA_MEDIA) && defined(USE_GAV)
++#if defined(USE_NEVA_MEDIA)
+   VideoWindowProviderDelegate* GetVideoWindowProviderDelegate() override;
+-#endif  // defined(USE_NEVA_MEDIA) && defined(USE_GAV)
++#endif  // defined(USE_NEVA_MEDIA)
+ 
+   // WaylandExtensionsWebos overrides
+   ExtendedInputWrapper* GetExtendedInput() override;
+
+diff --git a/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.cc b/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.cc
+--- a/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.cc
++++ b/src/ui/ozone/platform/wayland/extensions/webos/host/wayland_extensions_webos_impl.cc
+@@ -179,12 +179,16 @@ std::unique_ptr<WaylandWindow> WaylandExtensionsWebosImpl::CreateWaylandWindow(
+   return std::make_unique<WaylandWindowWebos>(delegate, connection, this);
+ }
+ 
+-#if defined(USE_NEVA_MEDIA) && defined(USE_GAV)
++#if defined(USE_NEVA_MEDIA)
+ VideoWindowProviderDelegate*
+ WaylandExtensionsWebosImpl::GetVideoWindowProviderDelegate() {
++#if defined(USE_GAV)
+   return foreign_video_window_manager_.get();
++#else
++  return nullptr;
++#endif
+ }
+-#endif  // defined(USE_NEVA_MEDIA) && defined(USE_GAV)
++#endif  // defined(USE_NEVA_MEDIA)
+ 
+ ExtendedInputWrapper* WaylandExtensionsWebosImpl::GetExtendedInput() {
+   return extended_input_.get();
