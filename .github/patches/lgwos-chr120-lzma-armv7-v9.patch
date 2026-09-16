@@ -67,3 +67,26 @@ diff --git a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc b/src/third
 +#endif
 +
  #include "base/check_op.h"
+
+diff --git a/src/ui/events/ozone/evdev/event_device_util.h b/src/ui/events/ozone/evdev/event_device_util.h
+index 2452a5c..64fed82 100644
+--- a/src/ui/events/ozone/evdev/event_device_util.h
++++ b/src/ui/events/ozone/evdev/event_device_util.h
+@@ -7,6 +7,17 @@
+ 
+ #include <limits.h>
+ 
++// LGWOS: the legacy Linux input UAPI headers predate these event-code names,
++// while their numeric slots are already inside the v3.10 KEY_MAX/SW_MAX ABI.
++// Supply the stable values so Chromium's optional capability probes compile;
++// unsupported devices simply report the corresponding bit as unset.
++#ifndef KEY_ASSISTANT
++#define KEY_ASSISTANT 0x247
++#endif
++#ifndef SW_PEN_INSERTED
++#define SW_PEN_INSERTED 0x0f
++#endif
++
+ namespace ui {
+ 
+ #define EVDEV_LONG_BITS (CHAR_BIT * sizeof(long))
