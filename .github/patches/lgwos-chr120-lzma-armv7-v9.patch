@@ -112,3 +112,44 @@ diff --git a/src/ui/ozone/platform/wayland/host/wayland_buffer_backing.h b/src/u
  #include "ui/gfx/geometry/size.h"
  #include "ui/gfx/native_widget_types.h"
  #include "ui/ozone/platform/wayland/common/wayland_object.h"
+
+diff --git a/src/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc b/src/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
+--- a/src/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
++++ b/src/ui/ozone/platform/wayland/host/zwp_text_input_wrapper_v1.cc
+@@ -240,13 +240,34 @@
+   // so if it exceeds 16 bits, it may be broken.
+   static constexpr size_t kSizeLimit = 60000;
+   if (HasAdvancedSurroundingTextSupport() && text.length() > kSizeLimit) {
++#if defined(OS_WEBOS)
++    // Linux 3.10 predates memfd_create(). Use an unlinked temporary file;
++    // the Wayland request only requires an fd containing the surrounding text.
++    base::FilePath temp_dir;
++    base::FilePath temp_path;
++    if (!base::GetTempDir(&temp_dir)) {
++      LOG(ERROR) << "Failed to locate temporary directory";
++      return;
++    }
++    base::ScopedFD memfd =
++        base::CreateAndOpenFdForTemporaryFileInDir(temp_dir, &temp_path);
++    if (!memfd.is_valid()) {
++      PLOG(ERROR) << "Failed to create surrounding-text temporary file";
++      return;
++    }
++    if (!base::SetCloseOnExec(memfd.get()) || !base::DeleteFile(temp_path)) {
++      PLOG(ERROR) << "Failed to anonymize surrounding-text temporary file";
++      return;
++    }
++#else
+     base::ScopedFD memfd(memfd_create("surrounding_text", MFD_CLOEXEC));
+-    if (!memfd.get()) {
++    if (!memfd.is_valid()) {
+       PLOG(ERROR) << "Failed to create memfd";
+       return;
+     }
++#endif
+     if (!base::WriteFileDescriptor(memfd.get(), text)) {
+-      LOG(ERROR) << "Failed to write into memfd";
++      LOG(ERROR) << "Failed to write surrounding text into shared fd";
+       return;
+     }
+     zcr_extended_text_input_v1_set_large_surrounding_text(
