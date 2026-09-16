@@ -349,3 +349,24 @@ diff --git a/src/third_party/wayland/include/config.h b/src/third_party/wayland/
  
  #define HAVE_MKOSTEMP
  
+
+diff --git a/src/third_party/blink/renderer/core/css/parser/css_parser_fast_paths.cc b/src/third_party/blink/renderer/core/css/parser/css_parser_fast_paths.cc
+index f73ee03..cfa4d7c 100644
+--- a/src/third_party/blink/renderer/core/css/parser/css_parser_fast_paths.cc
++++ b/src/third_party/blink/renderer/core/css/parser/css_parser_fast_paths.cc
+@@ -311,9 +311,12 @@
+ 
+     // https://community.arm.com/arm-community-blogs/b/infrastructure-solutions-blog/posts/porting-x86-vector-bitmask-optimizations-to-arm-neon
+     uint64_t is_decimal_bits =
+-        vget_lane_u64(vreinterpret_u64_u8(vshrn_n_u16(is_decimal_mask, 4)), 0);
+-    uint64_t is_mark_bits =
+-        vget_lane_u64(vreinterpret_u64_u8(vshrn_n_u16(is_mark_mask, 4)), 0);
++        vget_lane_u64(vreinterpret_u64_u8(vshrn_n_u16(
++                          vreinterpretq_u16_s8(is_decimal_mask), 4)),
++                      0);
++    uint64_t is_mark_bits = vget_lane_u64(
++        vreinterpret_u64_u8(vshrn_n_u16(vreinterpretq_u16_s8(is_mark_mask), 4)),
++        0);
+ 
+     // Only count the first decimal mark.
+     is_mark_bits &= -is_mark_bits;
