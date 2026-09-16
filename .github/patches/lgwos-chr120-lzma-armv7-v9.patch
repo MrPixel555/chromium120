@@ -69,10 +69,10 @@ diff --git a/src/third_party/crashpad/crashpad/util/linux/ptracer.cc b/src/third
  #include "base/check_op.h"
 
 diff --git a/src/ui/events/ozone/evdev/event_device_util.h b/src/ui/events/ozone/evdev/event_device_util.h
-index 2452a5c..64fed82 100644
+index 2452a5c..c622488 100644
 --- a/src/ui/events/ozone/evdev/event_device_util.h
 +++ b/src/ui/events/ozone/evdev/event_device_util.h
-@@ -7,6 +7,17 @@
+@@ -7,6 +7,20 @@
  
  #include <limits.h>
  
@@ -82,6 +82,9 @@ index 2452a5c..64fed82 100644
 +// unsupported devices simply report the corresponding bit as unset.
 +#ifndef KEY_ASSISTANT
 +#define KEY_ASSISTANT 0x247
++#endif
++#ifndef SW_MUTE_DEVICE
++#define SW_MUTE_DEVICE 0x0e
 +#endif
 +#ifndef SW_PEN_INSERTED
 +#define SW_PEN_INSERTED 0x0f
