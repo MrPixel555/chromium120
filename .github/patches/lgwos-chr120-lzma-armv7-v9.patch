@@ -96,3 +96,19 @@ index 2452a5c..8dca482 100644
  namespace ui {
  
  #define EVDEV_LONG_BITS (CHAR_BIT * sizeof(long))
+
+diff --git a/src/ui/ozone/platform/wayland/host/wayland_buffer_backing.h b/src/ui/ozone/platform/wayland/host/wayland_buffer_backing.h
+--- a/src/ui/ozone/platform/wayland/host/wayland_buffer_backing.h
++++ b/src/ui/ozone/platform/wayland/host/wayland_buffer_backing.h
+@@ -13,6 +13,11 @@
+ #else
+ #include "drm_fourcc.h"
+ #endif
++#ifndef DRM_FORMAT_INVALID
++// Stable DRM fourcc ABI: value 0 is reserved for an invalid format.
++#define DRM_FORMAT_INVALID 0
++#endif
++
+ #include "ui/gfx/geometry/size.h"
+ #include "ui/gfx/native_widget_types.h"
+ #include "ui/ozone/platform/wayland/common/wayland_object.h"
